@@ -1,1 +1,1 @@
-# Manged-Internship-SQ019-LMS-Skool-BE-
+# Managed-Internship-SQ019-LMS-Skool-BE-
