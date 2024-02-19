@@ -6,8 +6,8 @@
 # pg
 # reflect-metadata
 # typeorm
-
-# download DBeaver its a database Management Tool to view tables and models created
+# Download DBeaver, it is a database management tool, used to view are models and table present
+Here are the details needed
 Username: vxmjibrn
 Password: H3OFjWWyZHkx1yQlRu5vzcnH02iYlx3o
 Host: lallah.db.elephantsql.com
