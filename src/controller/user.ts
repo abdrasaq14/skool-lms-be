@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import { Users } from "../entity/user";
+import { Customer } from "../entity/user";
 import { AppDataSource } from "../database/data-source";
 
 // Create a User
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Users);
+    const userRepository = AppDataSource.getRepository(Customer);
 
-    const { fullname, email, password } = req.body;
+    const { firstName, email, password, countryOfResidence } = req.body;
 
     // Create a new user instance
-    const newUser = userRepository.create({ fullname, email, password });
+    const newUser = userRepository.create({ firstName, email, password, countryOfResidence });
 
     // Save the user to the database
     const savedUser = await userRepository.save(newUser);
@@ -25,7 +25,7 @@ export const createUser = async (req: Request, res: Response) => {
 // Get all Users
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Users);
+    const userRepository = AppDataSource.getRepository(Customer);
 
     const users = await userRepository.find();
 
@@ -39,7 +39,7 @@ export const getUsers = async (req: Request, res: Response) => {
 // Get a User
 export const getUser = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Users);
+    const userRepository = AppDataSource.getRepository(Customer);
 
     const user = await userRepository.findOneBy({ id: req.params.id });
 
@@ -57,7 +57,7 @@ export const getUser = async (req: Request, res: Response) => {
 // Update a User
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Users);
+    const userRepository = AppDataSource.getRepository(Customer);
 
     const user = await userRepository.findOneBy({ id: req.params.id });
 
@@ -79,7 +79,7 @@ export const updateUser = async (req: Request, res: Response) => {
 // Delete a User
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Users);
+    const userRepository = AppDataSource.getRepository(Customer);
 
     const user = await userRepository.findOneBy({ id: req.params.id });
 

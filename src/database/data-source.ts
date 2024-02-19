@@ -1,12 +1,14 @@
 import { DataSource } from "typeorm";
-import { Users } from "../entity/user";
+import { Customer } from "../entity/user";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  url: "postgres://vxmjibrn:H3OFjWWyZHkx1yQlRu5vzcnH02iYlx3o@lallah.db.elephantsql.com/vxmjibrn",
+  url: process.env.DB_CONNECTION_URL,
   synchronize: true,
-  logging: true,
-  entities: [Users],
+  logging: false,
+  entities: [Customer],
   subscribers: [],
   migrations: [],
 });
