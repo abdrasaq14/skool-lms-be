@@ -7,4 +7,8 @@
 # reflect-metadata
 # typeorm
 
-# Everyone should create a new instance on Elephant SQL and that should be used inviddually.
+# download DBeaver its a database Management Tool to view tables and models created
+Username: vxmjibrn
+Password: H3OFjWWyZHkx1yQlRu5vzcnH02iYlx3o
+Host: lallah.db.elephantsql.com
+Database: vxmjibrn

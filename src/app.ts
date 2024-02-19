@@ -4,6 +4,7 @@
    type NextFunction,
  } from "express";
  import createError from "http-errors";
+ import dotenv from "dotenv";
  import path from 'path';
  import cookieParser from 'cookie-parser';
  import logger from 'morgan';
@@ -13,7 +14,7 @@
  import indexRouter from './routes/index';
  import usersRouter from './routes/users';
 
-const app = express();
+dotenv.config();
 
 // Database Connection
 AppDataSource.initialize()
@@ -21,6 +22,8 @@ AppDataSource.initialize()
     console.log("Connected to the PostgresSql database succefully");
   })
   .catch((error) => console.log(error));
+
+const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
