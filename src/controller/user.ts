@@ -1,97 +1,97 @@
 import { Request, Response } from "express";
-import { Customer } from "../entity/user";
+import { User } from "../entity/user";
+import { Course } from "../entity/course"; // Import the Course entity
 import { AppDataSource } from "../database/data-source";
 
-// Create a User
-export const createUser = async (req: Request, res: Response) => {
+export const registrationStageController = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Customer);
+    const { firstName, lastName, email, phoneNumber, countryOfPermanentResidence } = req.body;
 
-    const { firstName, email, password, countryOfResidence } = req.body;
+    const user = new User();
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    user.phoneNumber = phoneNumber;
+    user.countryOfPermanentResidence = countryOfPermanentResidence;
 
-    // Create a new user instance
-    const newUser = userRepository.create({ firstName, email, password, countryOfResidence });
+    const userRepository = AppDataSource.getRepository(User);
+    await userRepository.save(user);
 
-    // Save the user to the database
-    const savedUser = await userRepository.save(newUser);
-
-    res.status(201).json(savedUser);
+    res.status(201).json({ message: 'User registered successfully', user });
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Get all Users
-export const getUsers = async (req: Request, res: Response) => {
+export const applicationStageController = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Customer);
+    const { userId, gender, countryOfBirth, nationality } = req.body;
 
-    const users = await userRepository.find();
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne(userId);
 
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error getting users:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-// Get a User
-export const getUser = async (req: Request, res: Response) => {
-  try {
-    const userRepository = AppDataSource.getRepository(Customer);
-
-    const user = await userRepository.findOneBy({ id: req.params.id });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    if (user) {
+      user.gender = gender;
+      user.countryOfBirth = countryOfBirth;
+      user.nationality = nationality;
+      await userRepository.save(user);
+      res.status(200).json({ message: 'Application stage updated successfully', user });
+    } else {
+      res.status(404).json({ error: 'User not found' });
     }
-
-    res.status(200).json(user);
   } catch (error) {
-    console.error("Error getting user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error updating application stage:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Update a User
-export const updateUser = async (req: Request, res: Response) => {
+export const qualificationStageController = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Customer);
+    const { userId, institutionName, fieldOfStudy, yearOfGraduation, gradeOfCGPA, qualificationType, countryOfInstitution } = req.body;
 
-    const user = await userRepository.findOneBy({ id: req.params.id });
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne(userId);
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    if (user) {
+      user.institutionName = institutionName;
+      user.fieldOfStudy = fieldOfStudy;
+      user.yearOfGraduation = yearOfGraduation;
+      user.gradeOfCGPA = gradeOfCGPA; // Change from gradeOfCCGP to gradeOfCGPA
+      user.qualificationType = qualificationType;
+      user.countryOfInstitution = countryOfInstitution;
+      await userRepository.save(user);
+      res.status(200).json({ message: 'Qualification stage updated successfully', user });
+    } else {
+      res.status(404).json({ error: 'User not found' });
     }
-
-    userRepository.merge(user, req.body);
-
-    const updatedUser = await userRepository.save(user);
-
-    res.status(200).json(updatedUser);
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error updating qualification stage:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Delete a User
-export const deleteUser = async (req: Request, res: Response) => {
+
+export const courseController = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Customer);
+    const { userId, courseType, studyMode, courseSearch, entryYear, entryMonth } = req.body;
 
-    const user = await userRepository.findOneBy({ id: req.params.id });
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne(userId);
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    if (user) {
+      // Create a new instance of Course using the constructor
+      const course = new Course(courseType, studyMode, courseSearch, entryYear, entryMonth, user);
+
+      const courseRepository = AppDataSource.getRepository(Course);
+      await courseRepository.save(course);
+      
+      res.status(201).json({ message: 'Course added successfully', course });
+    } else {
+      res.status(404).json({ error: 'User not found' });
     }
-
-    await userRepository.remove(user);
-
-    res.status(204).json(user);
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error adding course:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
