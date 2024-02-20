@@ -1,12 +1,13 @@
 import express from "express";
-import { registrationStageController, applicationStageController, qualificationStageController, courseController } from "../controller/user";
-
+import {
+  createUser,
+  loginUser
+} from "../controller/user";
 const router = express.Router();
 
-// Define routes
-router.post("/registration", registrationStageController);
-router.post("/application", applicationStageController);
-router.post("/qualification", qualificationStageController);
-router.post("/course", courseController); // Add route for adding a course
+/* GET users listing. */
+router.post("/register", createUser);
+router.post("/login", loginUser);
+
 
 export default router;
