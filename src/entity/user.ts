@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Course } from './course';
 
 @Entity()
 export class User {
@@ -49,6 +50,10 @@ export class User {
 
   @Column({ nullable: true })
   countryOfInstitution?: string;
+
+  // Association with Course
+  @OneToMany(() => Course, course => course.user)
+  courses!: Course[];
 
   constructor(
     firstName?: string,
