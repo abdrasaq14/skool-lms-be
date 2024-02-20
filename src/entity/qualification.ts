@@ -4,7 +4,7 @@ import { User } from './user';
 @Entity()
 export class Qualification {
   @PrimaryGeneratedColumn('uuid')
-  id: string = undefined!;
+  id!: string;
 
   @OneToOne(() => User)
   @JoinColumn()
@@ -19,8 +19,8 @@ export class Qualification {
   @Column({ nullable: true })
   yearOfGraduation?: number;
 
-  @Column({ nullable: true, name: 'gradeOfCGPA' }) 
-  gradeOfCGPA?: number;
+  @Column({ nullable: true }) 
+  gradeOfCGPA?: number; // Change this to a number type
 
   @Column({ nullable: true })
   qualificationType?: string;
@@ -33,7 +33,7 @@ export class Qualification {
     institutionName?: string,
     fieldOfStudy?: string,
     yearOfGraduation?: number,
-    gradeOfCGPA?: number,
+    gradeOfCGPA?: number, // Make sure the constructor parameter matches the type in the entity
     qualificationType?: string,
     countryOfInstitution?: string
   ) {

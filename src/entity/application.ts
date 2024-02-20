@@ -4,7 +4,7 @@ import { User } from './user';
 @Entity()
 export class Application {
   @PrimaryGeneratedColumn('uuid')
-  id: string = undefined!;
+  id!: string;
 
   @OneToOne(() => User)
   @JoinColumn()
