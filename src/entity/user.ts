@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
-export class Customer {
+export class User {
   @PrimaryGeneratedColumn("uuid")
     id!: string;
 
@@ -22,6 +22,7 @@ export class Customer {
 
   @Column()
   countryOfResidence: string;
+  courses: any;
 
   constructor(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, countryOfResidence: string) {
     this.firstName = firstName;
