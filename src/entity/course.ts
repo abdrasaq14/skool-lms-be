@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from './user';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { User } from './user'; // Update the import path if necessary
 
 @Entity()
 export class Course {
   @PrimaryGeneratedColumn('uuid')
-  id: string = undefined!;
+  id!: string;
 
   @Column({ nullable: false })
   courseType: string;
@@ -21,7 +21,8 @@ export class Course {
   @Column({ nullable: false })
   entryMonth: number;
 
-  @ManyToOne(() => User, user => user.courses) // Many courses can belong to one user
+  @OneToOne(() => User)
+  @JoinColumn()
   user: User;
 
   constructor(
