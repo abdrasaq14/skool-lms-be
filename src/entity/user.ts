@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
-export class Signup {
+export class Customer {
   @PrimaryGeneratedColumn("uuid")
     id!: string;
 
@@ -15,20 +15,20 @@ export class Signup {
   email: string;
 
   @Column()
+  phoneNumber: string;
+
+  @Column()
   password: string;
 
   @Column()
-  phoneNumber: number;
+  countryOfResidence: string;
 
-  @Column()
-  countryOfPermanentResidence: string;
-
-  constructor(firstName: string, lastName: string, email: string, password: string, phoneNumber: number,  countryOfPermanentResidence: string) {
+  constructor(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, countryOfResidence: string) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
-    this.password = password;
     this.phoneNumber = phoneNumber;
-    this.countryOfPermanentResidence =  countryOfPermanentResidence;
+    this.password = password;
+    this.countryOfResidence = countryOfResidence;
   }
 }
