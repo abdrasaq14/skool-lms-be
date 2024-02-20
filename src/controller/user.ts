@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { User } from "../entity/user";
+import { Course } from "../entity/course"; // Import the Course entity
 import { AppDataSource } from "../database/data-source";
 
 export const registrationStageController = async (req: Request, res: Response) => {
@@ -66,6 +67,30 @@ export const qualificationStageController = async (req: Request, res: Response) 
     }
   } catch (error) {
     console.error('Error updating qualification stage:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const courseController = async (req: Request, res: Response) => {
+  try {
+    const { userId, courseType, studyMode, courseSearch, entryYear, entryMonth } = req.body;
+
+    const userRepository = AppDataSource.getRepository(User);
+    const user = await userRepository.findOne(userId);
+
+    if (user) {
+      // Create a new instance of Course using the constructor
+      const course = new Course(courseType, studyMode, courseSearch, entryYear, entryMonth, user);
+
+      const courseRepository = AppDataSource.getRepository(Course);
+      await courseRepository.save(course);
+      
+      res.status(201).json({ message: 'Course added successfully', course });
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error adding course:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
