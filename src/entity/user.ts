@@ -1,4 +1,3 @@
-
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
@@ -13,7 +12,7 @@ export class User {
   @Column({ nullable: true })
   lastName?: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, unique: true }) // Set unique to true for email
   email?: string;
 
   @Column({ nullable: true })
@@ -42,8 +41,8 @@ export class User {
   @Column({ nullable: true })
   yearOfGraduation?: number;
 
-  @Column({ nullable: true })
-  gradeOfCCGP?: number;
+  @Column({ nullable: true, name: 'gradeOfCGPA' }) // Change name to gradeOfCGPA
+  gradeOfCGPA?: number;
 
   @Column({ nullable: true })
   qualificationType?: string;
@@ -63,7 +62,7 @@ export class User {
     institutionName?: string,
     fieldOfStudy?: string,
     yearOfGraduation?: number,
-    gradeOfCCGP?: number,
+    gradeOfCGPA?: number,
     qualificationType?: string,
     countryOfInstitution?: string
   ) {
@@ -78,9 +77,8 @@ export class User {
     this.institutionName = institutionName;
     this.fieldOfStudy = fieldOfStudy;
     this.yearOfGraduation = yearOfGraduation;
-    this.gradeOfCCGP = gradeOfCCGP;
+    this.gradeOfCGPA = gradeOfCGPA;
     this.qualificationType = qualificationType;
     this.countryOfInstitution = countryOfInstitution;
   }
 }
-
