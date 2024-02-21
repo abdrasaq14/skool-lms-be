@@ -24,6 +24,12 @@ export class User {
   countryOfResidence: string;
   courses: any;
 
+  @Column({ nullable: true })
+  resetToken: string | null;
+
+  @Column({ nullable: true, type: 'timestamp', default: null }) 
+  resetTokenExpires: Date | null;
+
   constructor(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, countryOfResidence: string) {
     this.firstName = firstName;
     this.lastName = lastName;
@@ -31,5 +37,7 @@ export class User {
     this.phoneNumber = phoneNumber;
     this.password = password;
     this.countryOfResidence = countryOfResidence;
+    this.resetToken = null;  
+   this.resetTokenExpires = null ;
   }
 }
