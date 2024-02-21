@@ -54,11 +54,13 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 export const forgotPasswordUser = async (req: Request, res: Response) => {
+  // console.log('Request received:', req.method, req.url, req.body);
   try {
     const userRepository = AppDataSource.getRepository(User);
-    const { email } = req.body;
+    const { email } = req.body
 
-    const user = await userRepository.findOne({ where: { email } });
+    // console.log('Input Email:', email);
+    const user = await userRepository.findOne({ where: { email: email.toLowerCase() } });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -74,14 +76,14 @@ export const forgotPasswordUser = async (req: Request, res: Response) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'SkoolLmsl@gmail.com', 
-        pass: 'your_email_password', 
+        user: process.env.GMAIL_SMP_USERNAME, 
+        pass: process.env.GMAIL_SMP_PASSWORD, 
       },
     });
 
     
     const mailOptions = {
-      from: 'skoolLms@gmail.com',
+      from:  process.env.GMAIL_SMP_USERNAME,
       to: email,
       subject: 'Password Reset',
       text: `Click the following link to reset your password: http://link/resetPassword/${resetToken}`,
