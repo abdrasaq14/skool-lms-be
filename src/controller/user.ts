@@ -15,6 +15,12 @@ export const createUser = async (req: Request, res: Response) => {
 
  
     const { firstName, lastName, email, phoneNumber, password, countryOfResidence } = req.body;
+    if(!firstName || !lastName || !email || !phoneNumber || !password || !countryOfResidence) return res.status(400).json({ error: "All fields are required" });
+
+    const user = await userRepository.findOneBy({ email });
+    if (user) {
+      return res.status(409).json({ error: 'User already exists' });
+    }
 
     const newUser = userRepository.create({ firstName, lastName,  email, phoneNumber, password, countryOfResidence });
 
