@@ -1,5 +1,5 @@
 import { Router } from "express"; // Import Router from express
-import { createUser, loginUser } from "../controller/user";
+import { createUser, loginUser, forgotPasswordUser } from "../controller/user";
 import { createCourse, createQualification, createApplication } from '../controller/onboarding'; // Update the path accordingly
 
 const router = Router();
@@ -16,6 +16,6 @@ router.post('/:userId/applications', createApplication);
 /* GET users listing. */
 router.post("/register", createUser);
 router.post("/login", loginUser);
-
+router.post("/forgotpassword", forgotPasswordUser )
 
 export default router;

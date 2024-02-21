@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { User } from "../entity/user";
 import { AppDataSource } from "../database/data-source";
 import jwt from "jsonwebtoken";
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const secret: any = process.env.JWT_SECRET
@@ -53,6 +56,58 @@ export const loginUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error logging in user:", error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const forgotPasswordUser = async (req: Request, res: Response) => {
+  // console.log('Request received:', req.method, req.url, req.body);
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+    const { email } = req.body
+
+    // console.log('Input Email:', email);
+    const user = await userRepository.findOne({ where: { email: email.toLowerCase() } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    user.resetToken = resetToken;
+    user.resetTokenExpires = new Date(Date.now() + 3600000);
+
+    await userRepository.save(user);
+
+   
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_SMP_USERNAME, 
+        pass: process.env.GMAIL_SMP_PASSWORD, 
+      },
+    });
+
+    
+    const mailOptions = {
+      from:  process.env.GMAIL_SMP_USERNAME,
+      to: email,
+      subject: 'Password Reset',
+      text: `Click the following link to reset your password: http://link/resetPassword/${resetToken}`,
+    };
+
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ error: 'Error sending reset email' });
+      } else {
+        console.log('Reset email sent:', info.response);
+        res.status(200).json({ message: 'Reset link sent to your email' });
+      }
+    });
+  } catch (error) {
+    console.error('Error initiating password reset:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
