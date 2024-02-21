@@ -1,13 +1,17 @@
 import { DataSource } from "typeorm";
 import { User } from "../entity/user";
-import { Course } from "../entity/course"; // Import the Course entity
+import { Course } from "../entity/course";
+import { Application } from "../entity/application"; // Import the Application entity
+import { Qualification } from "../entity/qualification"; // Import the Qualification entity
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  url: "postgres://vxmjibrn:H3OFjWWyZHkx1yQlRu5vzcnH02iYlx3o@lallah.db.elephantsql.com/vxmjibrn",
+  url: process.env.DB_URL,
   synchronize: true,
   logging: false,
-  entities: [User, Course], // Add Course entity here
+  entities: [User, Course, Application, Qualification], // Add Application and Qualification entities here
   subscribers: [],
   migrations: [],
 });

@@ -19,7 +19,7 @@ dotenv.config();
 // Database Connection
 AppDataSource.initialize()
   .then(() => {
-    console.log("Connected to the PostgresSql database succefully");
+    console.log("Connected to the PostgresSql database successfully");
   })
   .catch((error) => console.log(error));
 
