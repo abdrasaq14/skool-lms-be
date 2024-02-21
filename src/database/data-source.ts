@@ -8,7 +8,7 @@ dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  url: process.env.DB_URL,
+  url: process.env.DB_CONNECTION_URL,
   synchronize: true,
   logging: false,
   entities: [User, Course, Application, Qualification], // Add Application and Qualification entities here
