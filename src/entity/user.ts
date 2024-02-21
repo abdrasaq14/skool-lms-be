@@ -1,9 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { create } from "domain";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 @Entity()
 export class User {
+  update(arg0: { otpSecret: string; otp: string; otpExpiration: Date; }) {
+    throw new Error("Method not implemented.");
+  }
   @PrimaryGeneratedColumn("uuid")
-    id!: string;
+  id!: string;
 
   @Column()
   firstName: string;
@@ -24,24 +34,57 @@ export class User {
   countryOfResidence: string;
   courses: any;
 
-  // @Column({ nullable: true })
-  // resetToken: string | null;
+  @Column({ nullable: true, default: null })
+  otp: string;
 
-  @Column({ nullable: true, type: 'varchar' })
+  @Column({ nullable: true, default: null })
+  otpSecret: string;
+
+  @Column({ nullable: true, default: null })
+  otpExpiration: Date;
+
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column({ nullable: true, type: "varchar" })
   resetToken: string | null;
 
-
-  @Column({ nullable: true, type: 'timestamp', default: null })
+  @Column({ nullable: true, type: "timestamp", default: null })
   resetTokenExpires: Date | null;
 
-  constructor(firstName: string, lastName: string, email: string, phoneNumber: string, password: string, countryOfResidence: string) {
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  constructor(
+    firstName: string,
+    lastName: string,
+    email: string,
+    phoneNumber: string,
+    password: string,
+    countryOfResidence: string,
+    createdAt: Date,
+    updatedAt: Date,
+    otp: string,
+    otpSecret: string,
+    otpExpiration: Date,
+    isVerified: boolean
+  ) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.phoneNumber = phoneNumber;
     this.password = password;
     this.countryOfResidence = countryOfResidence;
-    this.resetToken = null;  
-    this.resetTokenExpires = null ;
+    this.otp = otp;
+    this.otpSecret = otpSecret;
+    this.otpExpiration = otpExpiration;
+    this.isVerified = isVerified;
+    this.resetToken = null;
+    this.resetTokenExpires = null;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
   }
 }
