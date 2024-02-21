@@ -19,7 +19,7 @@ dotenv.config();
 // Database Connection
 AppDataSource.initialize()
   .then(() => {
-    console.log("Connected to the PostgresSql database succefully");
+    console.log("Connected to the PostgresSql database successfully");
   })
   .catch((error) => console.log(error));
 
@@ -29,7 +29,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "../", 'public')));
+app.use(express.static('public'));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

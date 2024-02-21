@@ -1,97 +1,107 @@
 import { Request, Response } from "express";
-import { Customer } from "../entity/user";
+import { User } from "../entity/user";
+import { Course } from '../entity/course';
 import { AppDataSource } from "../database/data-source";
+import jwt from "jsonwebtoken";
+import { verify } from 'jsonwebtoken';
+import dotenv from "dotenv";
+dotenv.config();
 
+const secret: any = process.env.JWT_SECRET
 // Create a User
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Customer);
+    const userRepository = AppDataSource.getRepository(User);
 
-    const { firstName, email, password, countryOfResidence } = req.body;
+ 
+    const { firstName, lastName, email, phoneNumber, password, countryOfResidence } = req.body;
 
-    // Create a new user instance
-    const newUser = userRepository.create({ firstName, email, password, countryOfResidence });
+    const newUser = userRepository.create({ firstName, lastName,  email, phoneNumber, password, countryOfResidence });
 
-    // Save the user to the database
     const savedUser = await userRepository.save(newUser);
 
     res.status(201).json(savedUser);
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Get all Users
-export const getUsers = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Customer);
+    const userRepository = AppDataSource.getRepository(User);
 
-    const users = await userRepository.find();
+    const { email, password } = req.body;
+    if(!email || !password) return res.status(400).json({ error: "Email and password are required" });
+    
 
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error getting users:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-// Get a User
-export const getUser = async (req: Request, res: Response) => {
-  try {
-    const userRepository = AppDataSource.getRepository(Customer);
-
-    const user = await userRepository.findOneBy({ id: req.params.id });
+    const user = await userRepository.findOneBy({ email, password });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    
+    const token = jwt.sign({ id: user.id }, secret, {
+      expiresIn: "1h",
+    });
 
-    res.status(200).json(user);
+    res.status(200).json({ message: 'User logged in successfully', token});
   } catch (error) {
-    console.error("Error getting user:", error);
+    console.error("Error logging in user:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-// Update a User
-export const updateUser = async (req: Request, res: Response) => {
+export const courseController = async (req: Request, res: Response) => {
   try {
-    const userRepository = AppDataSource.getRepository(Customer);
+    // Destructure required properties from req.body
+    const { courseType, studyMode, courseSearch, entryYear, entryMonth } = req.body;
 
-    const user = await userRepository.findOneBy({ id: req.params.id });
+    // Get the token from the request headers
+    const token = req.headers.authorization;
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    // Check if the token exists
+    if (!token) {
+      return res.status(401).json({ error: 'Authorization token is missing' });
     }
 
-    userRepository.merge(user, req.body);
+    // Verify the token and extract the user ID
+    const decodedToken = verify(token, 'your_secret_key');
+    const userId = (decodedToken as any).userId; // Assuming the user ID is stored in the token as 'userId'
 
-    const updatedUser = await userRepository.save(user);
-
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-// Delete a User
-export const deleteUser = async (req: Request, res: Response) => {
-  try {
-    const userRepository = AppDataSource.getRepository(Customer);
-
-    const user = await userRepository.findOneBy({ id: req.params.id });
+    // Get repository for User model
+    const userRepository = AppDataSource.getRepository(User);
+    // Find the user by ID
+    const user = await userRepository.findOne(userId);
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    await userRepository.remove(user);
+    // Create a new instance of Course with provided arguments
+    const course = new Course(
+      courseType,
+      studyMode,
+      courseSearch,
+      entryYear,
+      entryMonth,
+      user // Attach the user to the course
+    );
 
-    res.status(204).json(user);
+    // Get repository for Course model
+    const courseRepository = AppDataSource.getRepository(Course);
+    // Save the course to the database
+    await courseRepository.save(course);
+
+    // Return success response with status code 201
+    return res.status(201).json({ message: 'Course added successfully', course });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    // Log the error
+    console.error('Error adding course:', error);
+    // Return internal server error response with status code 500
+    return res.status(500).json({ error: 'unsuccessful' });
   }
 };
+
+
+
