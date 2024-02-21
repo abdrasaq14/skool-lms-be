@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { User } from "../entity/user";
 import { AppDataSource } from "../database/data-source";
 import jwt from "jsonwebtoken";
@@ -111,22 +111,78 @@ export const forgotPasswordUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUser = async (req: Request, res: Response) => {
-  try {
-    const userRepository = AppDataSource.getRepository(User);
-    const user = await userRepository.findOne({ where: { id: req.params.id } });
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+// PASSWORD RESET FUNCTIONALITY
 
-    res.status(200).json(user);
-  } catch (error) {
-    console.error('Error getting user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+
+
+
+export const resetPassword = async (req: express.Request, res: express.Response): Promise<void> => {
+
+  const userRepository = AppDataSource.getRepository(User);
+  const { email } = req.body
+  
+  const user = await userRepository.findOne({ where: { email } })
+
+  if (!user) {
+    res.status(404).json({ error: 'User not found' })
+    return
   }
-}  
 
+  const token = crypto.randomBytes(20).toString('hex')
+  user.resetPasswordToken = token
+  user.resetPasswordExpiration = new Date(Date.now() + 3600000) // 1 hour
+  await user.save()
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_SMP_USERNAME, 
+      pass: process.env.GMAIL_SMP_PASSWORD, 
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.GMAIL_SMP_USERNAME,
+    to: email,
+    subject: 'Password Reset',
+    text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\nPlease click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\nhttp://${req.headers.host}/reset/${token}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`
+  }
+
+  await transporter.sendMail(mailOptions)
+  res.status(200).json({ message: 'An email has been sent to the address provided with further instructions.' })
+}
+
+export const resetPasswordToken = async (req: express.Request, res: express.Response): Promise<void> => {
+  const userRepository = AppDataSource.getRepository(User);
+  const { token } = req.params
+  const { password } = req.body
+
+  const user = await userRepository.findOne({ where: { resetPasswordToken: token } })
+
+  if (!user) {
+    res
+      .status(404)
+      .json({ error: 'Password reset token is invalid or has expired.' })
+    return
+  }
+
+  if (!user.resetPasswordExpiration || Date.now() > user.resetPasswordExpiration.getTime()) {
+    res
+      .status(401)
+      .json({ error: 'Password reset token is invalid or has expired.' })
+    return
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 12)
+  user.password = hashedPassword
+
+  user.resetPasswordToken = null
+  user.resetPasswordExpiration = null
+  await user.save()
+
+  res.status(200).json({ message: 'Your password has been reset!' })
+}
 
 
 
