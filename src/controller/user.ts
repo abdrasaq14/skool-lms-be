@@ -8,12 +8,13 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import speakeasy from "speakeasy";
 import { transporter } from "../utilities/emailsender";
+import type { AuthRequest } from "../../extender";
 
 dotenv.config();
 
 const secret: any = process.env.JWT_SECRET;
 // Create a User
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: AuthRequest, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
@@ -57,29 +58,27 @@ export const createUser = async (req: Request, res: Response) => {
 
       if (!user) {
         return res.json({ notFoundError: "User not found" });
-      }
-      else {
+      } else {
+        const totpSecret = speakeasy.generateSecret({ length: 20 });
 
-      const totpSecret = speakeasy.generateSecret({ length: 20 });
+        user.otpSecret = totpSecret.base32;
+        user.otp = speakeasy.totp({
+          secret: totpSecret.base32,
+          encoding: "base32",
+        });
+        user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000);
 
-      user.otpSecret = totpSecret.base32;
-      user.otp = speakeasy.totp({
-        secret: totpSecret.base32,
-        encoding: "base32",
-      });
-      user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); 
+        await userRepository.save(user);
 
-      await userRepository.save(user); 
-
-      const mailOptions = {
-        from: {
-          name: "Skool LMS",
-          address: "info.skool.lms@gmail.com",
-        },
-        to: email,
-        subject: "Skool LMS - Email Verification",
-        text: `TOTP: ${user.otp}`,
-        html: `<h3>Hi there,
+        const mailOptions = {
+          from: {
+            name: "Skool LMS",
+            address: "info.skool.lms@gmail.com",
+          },
+          to: email,
+          subject: "Skool LMS - Email Verification",
+          text: `TOTP: ${user.otp}`,
+          html: `<h3>Hi there,
         Thank you for signing up to Skool LMS. Copy the OTP below to verify your email:</h3>
         <h1>${user.otp}</h1>
         <h3>This OTP will expire in 10 minutes. If you did not sign up for a Skool LMS account,
@@ -87,17 +86,18 @@ export const createUser = async (req: Request, res: Response) => {
         <br>
         Best, <br>
         The Skool LMS Team</h3>`,
-      };
-      await transporter.sendMail(mailOptions);
-      res.json({ successfulSignup: "Student signup successful" });
-    }}
+        };
+        await transporter.sendMail(mailOptions);
+        res.json({ successfulSignup: "Student signup successful" });
+      }
+    }
   } catch (error) {
     console.error("Error registering user:", error);
     res.json({ error: "Internal server error" });
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: AuthRequest, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
@@ -131,7 +131,7 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export const forgotPasswordUser = async (req: Request, res: Response) => {
+export const forgotPasswordUser = async (req: AuthRequest, res: Response) => {
   // console.log('Request received:', req.method, req.url, req.body);
   try {
     const userRepository = AppDataSource.getRepository(User);
@@ -185,8 +185,8 @@ export const forgotPasswordUser = async (req: Request, res: Response) => {
 // PASSWORD RESET FUNCTIONALITY
 
 export const resetPassword = async (
-  req: express.Request,
-  res: express.Response
+  req: Request,
+  res: Response
 ): Promise<void> => {
   const userRepository = AppDataSource.getRepository(User);
   const { email } = req.body;
@@ -200,7 +200,7 @@ export const resetPassword = async (
 
   const token = crypto.randomBytes(20).toString("hex");
   user.resetToken = token;
-  user.resetTokenExpires = new Date(Date.now() + 3600000); 
+  user.resetTokenExpires = new Date(Date.now() + 3600000);
   await userRepository.save(user);
 
   const transporter = nodemailer.createTransport({
@@ -264,49 +264,46 @@ export const resetPasswordToken = async (
   res.status(200).json({ message: "Your password has been reset!" });
 };
 
-
-
 export const verifyOTPEmailAuth = async (
-  req: Request,
+  req: AuthRequest,
   res: Response
 ): Promise<void> => {
   try {
     const { otp } = req.body;
- 
+
     const userRepository = AppDataSource.getRepository(User);
- 
+
     // Find user by OTP
     const user = await userRepository.findOne({ where: { otp } });
- 
+
     if (!user) {
-      res.status(404).json({ error: "User not found" });
+      res.json({ invalidOtp: "Invalid OTP, try again" });
       return;
     }
- 
+
     // Verify OTP
     const verified = speakeasy.totp.verify({
       secret: user.otpSecret,
       encoding: "base32",
       token: otp,
     });
- 
+
     if (Date.now() > user.otpExpiration.getTime()) {
-      res.status(400).json({ error: "Invalid or expired OTP" });
+      res.json({ expiredOtp: "Expired OTP" });
       return;
     }
- 
+
     // Clear the OTP from the user record
     user.otp = "";
     user.otpExpiration = new Date(0);
- 
+
     // Add the isVerified property to the user object
     user.isVerified = true;
     await userRepository.save(user);
- 
-    res.status(200).json({ message: "OTP verified successfully" });
+
+    res.json({ verifySuccessful: "OTP verified successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
- 
