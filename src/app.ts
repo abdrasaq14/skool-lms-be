@@ -3,6 +3,7 @@ import express, {
   type Response,
   type NextFunction,
 } from "express";
+import session from "express-session";
 import createError from "http-errors";
 import dotenv from "dotenv";
 import path from "path";
@@ -28,6 +29,14 @@ AppDataSource.initialize()
 const app = express();
 
 app.use(
+  session({
+    secret: process.env.secret ?? '',
+    resave: false,
+    saveUninitialized: true
+  })
+)
+
+app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
@@ -39,8 +48,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static("public"));
-
-
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);

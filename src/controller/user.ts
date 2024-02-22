@@ -8,12 +8,13 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import speakeasy from "speakeasy";
 import { transporter } from "../utilities/emailsender";
+import type { AuthRequest } from "../../extender";
 
 dotenv.config();
 
 const secret: any = process.env.JWT_SECRET;
 // Create a User
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: AuthRequest, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
@@ -57,29 +58,27 @@ export const createUser = async (req: Request, res: Response) => {
 
       if (!user) {
         return res.json({ notFoundError: "User not found" });
-      }
-      else {
+      } else {
+        const totpSecret = speakeasy.generateSecret({ length: 20 });
 
-      const totpSecret = speakeasy.generateSecret({ length: 20 });
+        user.otpSecret = totpSecret.base32;
+        user.otp = speakeasy.totp({
+          secret: totpSecret.base32,
+          encoding: "base32",
+        });
+        user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-      user.otpSecret = totpSecret.base32;
-      user.otp = speakeasy.totp({
-        secret: totpSecret.base32,
-        encoding: "base32",
-      });
-      user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        await userRepository.save(user); // Save the updated user
 
-      await userRepository.save(user); // Save the updated user
-
-      const mailOptions = {
-        from: {
-          name: "Skool LMS",
-          address: "info.skool.lms@gmail.com",
-        },
-        to: email,
-        subject: "Skool LMS - Email Verification",
-        text: `TOTP: ${user.otp}`,
-        html: `<h3>Hi there,
+        const mailOptions = {
+          from: {
+            name: "Skool LMS",
+            address: "info.skool.lms@gmail.com",
+          },
+          to: email,
+          subject: "Skool LMS - Email Verification",
+          text: `TOTP: ${user.otp}`,
+          html: `<h3>Hi there,
         Thank you for signing up to Skool LMS. Copy the OTP below to verify your email:</h3>
         <h1>${user.otp}</h1>
         <h3>This OTP will expire in 10 minutes. If you did not sign up for a Skool LMS account,
@@ -87,17 +86,18 @@ export const createUser = async (req: Request, res: Response) => {
         <br>
         Best, <br>
         The Skool LMS Team</h3>`,
-      };
-      await transporter.sendMail(mailOptions);
-      res.json({ successfulSignup: "Student signup successful" });
-    }}
+        };
+        await transporter.sendMail(mailOptions);
+        res.json({ successfulSignup: "Student signup successful" });
+      }
+    }
   } catch (error) {
     console.error("Error registering user:", error);
     res.json({ error: "Internal server error" });
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: AuthRequest, res: Response) => {
   try {
     const userRepository = AppDataSource.getRepository(User);
 
@@ -131,7 +131,7 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export const forgotPasswordUser = async (req: Request, res: Response) => {
+export const forgotPasswordUser = async (req: AuthRequest, res: Response) => {
   // console.log('Request received:', req.method, req.url, req.body);
   try {
     const userRepository = AppDataSource.getRepository(User);
@@ -185,8 +185,8 @@ export const forgotPasswordUser = async (req: Request, res: Response) => {
 // PASSWORD RESET FUNCTIONALITY
 
 export const resetPassword = async (
-  req: express.Request,
-  res: express.Response
+  req: Request,
+  res: Response
 ): Promise<void> => {
   const userRepository = AppDataSource.getRepository(User);
   const { email } = req.body;
