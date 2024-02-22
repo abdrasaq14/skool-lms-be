@@ -11,8 +11,6 @@ import { transporter } from "../utilities/emailsender";
 
 dotenv.config();
 
-
-
 const secret: any = process.env.JWT_SECRET;
 // Create a User
 export const createUser = async (req: Request, res: Response) => {
@@ -35,53 +33,53 @@ export const createUser = async (req: Request, res: Response) => {
       !password ||
       !countryOfResidence
     )
-      return res.status(400).json({ error: "All fields are required" });
+      return res.json({ error: "All fields are required" });
 
     let user = await userRepository.findOneBy({ email });
 
     if (user) {
-      return res.status(409).json({ error: "User already exists" });
-    }
-    const hashedPassword = await bcrypt.hash(password, 12);
+      return res.json({ existingUserError: "User already exists" });
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 12);
 
-    const newUser = userRepository.create({
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      password: hashedPassword,
-      countryOfResidence,
-    });
+      const newUser = userRepository.create({
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        password: hashedPassword,
+        countryOfResidence,
+      });
 
-    await userRepository.save(newUser);
+      await userRepository.save(newUser);
 
-    user = await userRepository.findOne({ where: { email } });
+      user = await userRepository.findOne({ where: { email } });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-  
+      if (!user) {
+        return res.json({ notFoundError: "User not found" });
+      }
+      else {
 
-    const totpSecret = speakeasy.generateSecret({ length: 20 });
+      const totpSecret = speakeasy.generateSecret({ length: 20 });
 
-    user.otpSecret = totpSecret.base32;
-    user.otp = speakeasy.totp({
-      secret: totpSecret.base32,
-      encoding: "base32",
-    });
-    user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      user.otpSecret = totpSecret.base32;
+      user.otp = speakeasy.totp({
+        secret: totpSecret.base32,
+        encoding: "base32",
+      });
+      user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    await userRepository.save(user); // Save the updated user
+      await userRepository.save(user); // Save the updated user
 
-    const mailOptions = {
-      from: {
-        name: "Skool LMS",
-        address: "info.skool.lms@gmail.com",
-      },
-      to: email,
-      subject: "Skool LMS - Email Verification",
-      text: `TOTP: ${user.otp}`,
-      html: `<h3>Hi there,
+      const mailOptions = {
+        from: {
+          name: "Skool LMS",
+          address: "info.skool.lms@gmail.com",
+        },
+        to: email,
+        subject: "Skool LMS - Email Verification",
+        text: `TOTP: ${user.otp}`,
+        html: `<h3>Hi there,
         Thank you for signing up to Skool LMS. Copy the OTP below to verify your email:</h3>
         <h1>${user.otp}</h1>
         <h3>This OTP will expire in 10 minutes. If you did not sign up for a Skool LMS account,
@@ -89,15 +87,15 @@ export const createUser = async (req: Request, res: Response) => {
         <br>
         Best, <br>
         The Skool LMS Team</h3>`,
-    };
-    await transporter.sendMail(mailOptions);
-    res.json({ successfulSignup: "Student signup successful" });
+      };
+      await transporter.sendMail(mailOptions);
+      res.json({ successfulSignup: "Student signup successful" });
+    }}
   } catch (error) {
     console.error("Error registering user:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.json({ error: "Internal server error" });
   }
 };
-
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
