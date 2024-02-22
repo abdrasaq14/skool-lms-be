@@ -16,3 +16,6 @@ Database: vxmjibrn
 updated .env with this values
 GMAIL_SMP_USERNAME=info.skool.lms@gmail.com
 GMAIL_SMP_PASSWORD=hhqtivfbsyoewbik
+
+//for session
+secret='skool-lms'
