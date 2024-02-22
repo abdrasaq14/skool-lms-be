@@ -66,9 +66,9 @@ export const createUser = async (req: AuthRequest, res: Response) => {
           secret: totpSecret.base32,
           encoding: "base32",
         });
-        user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000);
 
-        await userRepository.save(user); // Save the updated user
+        await userRepository.save(user);
 
         const mailOptions = {
           from: {
@@ -200,7 +200,7 @@ export const resetPassword = async (
 
   const token = crypto.randomBytes(20).toString("hex");
   user.resetToken = token;
-  user.resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+  user.resetTokenExpires = new Date(Date.now() + 3600000);
   await userRepository.save(user);
 
   const transporter = nodemailer.createTransport({
@@ -262,4 +262,48 @@ export const resetPasswordToken = async (
   await userRepository.save(user);
 
   res.status(200).json({ message: "Your password has been reset!" });
+};
+
+export const verifyOTPEmailAuth = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { otp } = req.body;
+
+    const userRepository = AppDataSource.getRepository(User);
+
+    // Find user by OTP
+    const user = await userRepository.findOne({ where: { otp } });
+
+    if (!user) {
+      res.json({ invalidOtp: "Invalid OTP, try again" });
+      return;
+    }
+
+    // Verify OTP
+    const verified = speakeasy.totp.verify({
+      secret: user.otpSecret,
+      encoding: "base32",
+      token: otp,
+    });
+
+    if (Date.now() > user.otpExpiration.getTime()) {
+      res.json({ expiredOtp: "Expired OTP" });
+      return;
+    }
+
+    // Clear the OTP from the user record
+    user.otp = "";
+    user.otpExpiration = new Date(0);
+
+    // Add the isVerified property to the user object
+    user.isVerified = true;
+    await userRepository.save(user);
+
+    res.json({ verifySuccessful: "OTP verified successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
