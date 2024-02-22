@@ -67,9 +67,9 @@ export const createUser = async (req: Request, res: Response) => {
         secret: totpSecret.base32,
         encoding: "base32",
       });
-      user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+      user.otpExpiration = new Date(Date.now() + 10 * 60 * 1000); 
 
-      await userRepository.save(user); // Save the updated user
+      await userRepository.save(user); 
 
       const mailOptions = {
         from: {
