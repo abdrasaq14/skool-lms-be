@@ -263,3 +263,50 @@ export const resetPasswordToken = async (
 
   res.status(200).json({ message: "Your password has been reset!" });
 };
+
+
+
+export const verifyOTPEmailAuth = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { otp } = req.body;
+ 
+    const userRepository = AppDataSource.getRepository(User);
+ 
+    // Find user by OTP
+    const user = await userRepository.findOne({ where: { otp } });
+ 
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+ 
+    // Verify OTP
+    const verified = speakeasy.totp.verify({
+      secret: user.otpSecret,
+      encoding: "base32",
+      token: otp,
+    });
+ 
+    if (Date.now() > user.otpExpiration.getTime()) {
+      res.status(400).json({ error: "Invalid or expired OTP" });
+      return;
+    }
+ 
+    // Clear the OTP from the user record
+    user.otp = "";
+    user.otpExpiration = new Date(0);
+ 
+    // Add the isVerified property to the user object
+    user.isVerified = true;
+    await userRepository.save(user);
+ 
+    res.status(200).json({ message: "OTP verified successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+ 
