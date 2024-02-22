@@ -6,6 +6,9 @@ import jwt from "jsonwebtoken";
 import { verify } from 'jsonwebtoken';
 import dotenv from "dotenv";
 dotenv.config();
+import bcrypt from "bcrypt";
+import { transporter } from "../utilities/emailsender";
+
 
 const secret: any = process.env.JWT_SECRET
 // Create a User
@@ -21,10 +24,18 @@ export const createUser = async (req: Request, res: Response) => {
     if (user) {
       return res.status(409).json({ error: 'User already exists' });
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = userRepository.create({ firstName, lastName,  email, phoneNumber, password, countryOfResidence });
+    const newUser = userRepository.create({ firstName, lastName,  email, phoneNumber, password: hashedPassword, countryOfResidence });
 
     const savedUser = await userRepository.save(newUser);
+
+    const verifyMail = await transporter.sendMail({
+      from: process.env.GMAIL_SMP_USERNAME, 
+      to: email, 
+      subject: "Activation Link", 
+      text: "Hello world?", 
+    });
 
     res.status(201).json(savedUser);
   } catch (error) {

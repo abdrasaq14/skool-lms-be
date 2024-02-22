@@ -10,10 +10,12 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/http-errors": "^2.0.4",
-    "@types/nodemailer": "^6.4.14",
     "@types/jsonwebtoken": "^9.0.5",
+    "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.11.0",
+    "bcrypt": "^5.1.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^16.4.4",
