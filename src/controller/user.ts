@@ -12,6 +12,8 @@ import type { AuthRequest } from "../../extender";
 
 dotenv.config();
 
+const frontEndUrl = process.env.FRONTEND_URL;
+
 const secret: any = process.env.JWT_SECRET;
 // Create a User
 export const createUser = async (req: AuthRequest, res: Response) => {
@@ -98,6 +100,8 @@ export const createUser = async (req: AuthRequest, res: Response) => {
 };
 
 export const loginUser = async (req: AuthRequest, res: Response) => {
+  console.log("request received-login starting.....");
+
   try {
     const userRepository = AppDataSource.getRepository(User);
 
@@ -143,7 +147,7 @@ export const forgotPasswordUser = async (req: AuthRequest, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.json({ error: "Account does not exist" });
     }
 
     const resetToken = crypto.randomBytes(20).toString("hex");
@@ -164,16 +168,16 @@ export const forgotPasswordUser = async (req: AuthRequest, res: Response) => {
       from: process.env.GMAIL_SMP_USERNAME,
       to: email,
       subject: "Password Reset",
-      text: `Click the following link to reset your password: http://link/resetPassword/${resetToken}`,
+      text: `Click the following link to reset your password: ${frontEndUrl}/resetpassword/${resetToken} \n\n If you did not request this, please ignore this email and your password will remain unchanged.\n`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("Error sending email:", error);
-        res.status(500).json({ error: "Error sending reset email" });
+        res.json({ error: "Error sending reset email" });
       } else {
         console.log("Reset email sent:", info.response);
-        res.status(200).json({ message: "Reset link sent to your email" });
+        res.json({ successMessage: "Reset link sent to your email" });
       }
     });
   } catch (error) {
@@ -194,7 +198,7 @@ export const resetPassword = async (
   const user = await userRepository.findOne({ where: { email } });
 
   if (!user) {
-    res.status(404).json({ error: "User not found" });
+    res.json({ error: "User not found" });
     return;
   }
 
@@ -215,19 +219,19 @@ export const resetPassword = async (
     from: process.env.GMAIL_SMP_USERNAME,
     to: email,
     subject: "Password Reset",
-    text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\nPlease click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\nhttp://${req.headers.host}/reset/${token}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    text: `You are receiving this because you (or someone else) has requested the reset of the password for your account.\n\nPlease click on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n ${frontEndUrl}/new-password/${token}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
   };
 
   await transporter.sendMail(mailOptions);
-  res.status(200).json({
-    message:
+  res.json({
+    successMessage:
       "An email has been sent to the address provided with further instructions.",
   });
 };
 
 export const resetPasswordToken = async (
-  req: express.Request,
-  res: express.Response
+  req: Request,
+  res: Response
 ): Promise<void> => {
   const userRepository = AppDataSource.getRepository(User);
   const { token } = req.params;
@@ -238,9 +242,7 @@ export const resetPasswordToken = async (
   });
 
   if (!user) {
-    res
-      .status(404)
-      .json({ error: "Password reset token is invalid or has expired." });
+    res.json({ error: "Password reset token is invalid" });
     return;
   }
 
@@ -248,9 +250,7 @@ export const resetPasswordToken = async (
     !user.resetTokenExpires ||
     Date.now() > user.resetTokenExpires.getTime()
   ) {
-    res
-      .status(401)
-      .json({ error: "Password reset token is invalid or has expired." });
+    res.json({ error: "Password reset token has expired." });
     return;
   }
 
@@ -261,7 +261,7 @@ export const resetPasswordToken = async (
   user.resetTokenExpires = null;
   await userRepository.save(user);
 
-  res.status(200).json({ message: "Your password has been reset!" });
+  res.json({ successMessage: "Your password has been reset!" });
 };
 
 export const verifyOTPEmailAuth = async (

@@ -27,18 +27,19 @@ AppDataSource.initialize()
   .catch((error) => console.log(error));
 
 const app = express();
+const frontEndUrl = process.env.FRONTEND_URL
 
 app.use(
   session({
-    secret: process.env.secret ?? '',
+    secret: process.env.secret ?? "",
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
   })
-)
+);
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: frontEndUrl,
     credentials: true,
   })
 );
