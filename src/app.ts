@@ -15,6 +15,7 @@ import cors from "cors";
 
 import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
+import protectedRouter from "./routes/protectedRoutes";
 import { request } from "http";
 
 dotenv.config();
@@ -27,7 +28,7 @@ AppDataSource.initialize()
   .catch((error) => console.log(error));
 
 const app = express();
-const frontEndUrl = process.env.FRONTEND_URL
+const frontEndUrl = process.env.FRONTEND_URL;
 
 app.use(
   session({
@@ -52,6 +53,7 @@ app.use(express.static("public"));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/protected-route", protectedRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
