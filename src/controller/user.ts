@@ -143,7 +143,7 @@ export const forgotPasswordUser = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ errorMessage: "User not found" });
     }
 
     const resetToken = crypto.randomBytes(20).toString("hex");
@@ -164,7 +164,7 @@ export const forgotPasswordUser = async (req: Request, res: Response) => {
       from: process.env.GMAIL_SMP_USERNAME,
       to: email,
       subject: "Password Reset",
-      text: `Click the following link to reset your password: http://link/resetPassword/${resetToken}`,
+      text: `Click the following link to reset your password: http://localhost:5173/new-password/${resetToken}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -173,7 +173,7 @@ export const forgotPasswordUser = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Error sending reset email" });
       } else {
         console.log("Reset email sent:", info.response);
-        res.status(200).json({ message: "Reset link sent to your email" });
+        res.status(200).json({ successMessage: "Reset link sent to your email" });
       }
     });
   } catch (error) {
