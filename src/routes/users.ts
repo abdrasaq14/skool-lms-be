@@ -1,5 +1,11 @@
 import { Router } from "express"; // Import Router from express
-import { createUser, loginUser, forgotPasswordUser, verifyOTPEmailAuth  } from "../controller/user";
+import {
+  createUser,
+  loginUser,
+  verifyOTPEmailAuth,
+  resetPassword,
+  resetPasswordToken,
+} from "../controller/user";
 import {
   createCourse,
   createQualification,
@@ -11,9 +17,8 @@ const router = Router();
 
 router.post("/register", createUser);
 router.post("/login", loginUser);
-router.post("/forgotpassword", forgotPasswordUser);
-
-
+router.post("/forgotpassword", resetPassword);
+router.post("/forgotpassword/:token", resetPasswordToken);
 // Route for creating a new course
 router.post("/:userId/courses", createCourse);
 
