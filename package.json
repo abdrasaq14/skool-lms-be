@@ -25,6 +25,7 @@
     "dotenv": "^16.4.4",
     "express": "~4.16.1",
     "express-session": "^1.18.0",
+    "express-validator": "^7.0.1",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "~1.9.1",
