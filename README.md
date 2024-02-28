@@ -19,3 +19,11 @@ GMAIL_SMP_PASSWORD=hhqtivfbsyoewbik
 
 //for session
 secret='skool-lms'
+
+# include this in your env file 
+FRONTEND_URL=http://localhost:5173
+
+
+# backend server has been hosted on 
+https://skool-lms-server.onrender.com
+
