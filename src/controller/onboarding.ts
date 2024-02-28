@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/data-source';
 import { User } from '../entity/user';
 import { Course } from '../entity/course';
-import { Qualification } from '../entity/qualification';
+// import { Qualification } from '../entity/qualification';
 import { Application } from '../entity/application';
 
 const formData: Record<string, any> = {};
@@ -13,13 +13,13 @@ export const updateOnboarding = async (req: Request, res: Response) => {
         const userId = req.params.userId;
 
         // Extract profile data from the request body
-        const { course, application, qualification } = req.body;
+        const { course, application } = req.body;
 
         // Store the form data for the current stage
-        formData[userId] = { ...formData[userId], ...course, ...application, ...qualification };
+        formData[userId] = { ...formData[userId], ...course, ...application};
 
         // If it's not the last stage, return a success message
-        if (formData[userId].stage < 3) {
+        if (formData[userId].stage < 2) {
             return res.status(200).json({ message: 'Data saved successfully' });
         }
 
@@ -55,22 +55,10 @@ export const updateOnboarding = async (req: Request, res: Response) => {
             finalFormData.nationality
         );
 
-        // Create and associate Qualification entity
-        const qualificationEntity = new Qualification(
-            user,
-            finalFormData.institutionName,
-            finalFormData.fieldOfStudy,
-            finalFormData.yearOfGraduation,
-            finalFormData.gradeOfCGPA,
-            finalFormData.qualificationType,
-            finalFormData.countryOfInstitution
-        );
-
         // Save the entities
         await userRepository.save(user);
         await userRepository.save(courseEntity);
         await userRepository.save(applicationEntity);
-        await userRepository.save(qualificationEntity);
 
         // Clear the form data after submission
         delete formData[userId];
@@ -104,30 +92,6 @@ export const createCourse = async (req: Request, res: Response) => {
     res.status(201).json(savedCourse);
   } catch (error) {
     console.error('Error creating course:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-export const createQualification = async (req: Request, res: Response) => {
-  try {
-    const userId = req.params.userId;
-    const user = await AppDataSource.getRepository(User).findOne({ where: { id: userId } });
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const qualificationRepository = AppDataSource.getRepository(Qualification);
-
-    const { institutionName, fieldOfStudy, yearOfGraduation, gradeOfCGPA, qualificationType, countryOfInstitution } = req.body;
-
-    const newQualification = qualificationRepository.create({ user, institutionName, fieldOfStudy, yearOfGraduation, gradeOfCGPA, qualificationType, countryOfInstitution });
-
-    const savedQualification = await qualificationRepository.save(newQualification);
-
-    res.status(201).json(savedQualification);
-  } catch (error) {
-    console.error('Error creating qualification:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
