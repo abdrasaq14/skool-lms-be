@@ -8,10 +8,10 @@ import {
 } from "../controller/user";
 import {
   createCourse,
-  createQualification,
   createApplication,
   updateOnboarding,
 } from "../controller/onboarding"; // Update the path accordingly
+import { createProfessionalApplication } from "../controller/professional";
 
 const router = Router();
 
@@ -22,14 +22,15 @@ router.post("/forgotpassword/:token", resetPasswordToken);
 // Route for creating a new course
 router.post("/:userId/courses", createCourse);
 
-// Route for creating a new qualification
-router.post("/:userId/qualifications", createQualification);
 
 // Route for creating a new application
 router.post("/:userId/applications", createApplication);
 
 // Route for updating onboarding details
 router.put("/:userId/onboarding", updateOnboarding);
+
+// Route for creating a new professional application
+router.post("/professional-application", createProfessionalApplication);
 
 router.post("/verify-otp", verifyOTPEmailAuth);
 
