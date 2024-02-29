@@ -11,7 +11,7 @@ import {
   createApplication,
   updateOnboarding,
 } from "../controller/onboarding"; // Update the path accordingly
-import { createProfessionalApplication } from "../controller/professional";
+import { createProfessionalApplication, getAllProfessionalApplicationsWithStatus } from "../controller/professional";
 
 const router = Router();
 
@@ -31,6 +31,9 @@ router.put("/:userId/onboarding", updateOnboarding);
 
 // Route for creating a new professional application
 router.post("/professional-application", createProfessionalApplication);
+
+// Route to get all Professional applications with the status
+router.get("/professional-applications", getAllProfessionalApplicationsWithStatus);
 
 router.post("/verify-otp", verifyOTPEmailAuth);
 
