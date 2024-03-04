@@ -6,9 +6,12 @@
 # pg
 # reflect-metadata
 # typeorm
-# Download DBeaver, it is a database management tool, used to view are models and table present
+# Download DBeaver, it is a database management tool, used to view models and table present
 
 
 # backend server has been hosted on 
 https://skool-lms-server.onrender.com
 
+# An admin account has been added
+Email: samuelfagbohun996@gmail.com
+Password: samuel123
