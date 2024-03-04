@@ -13,6 +13,7 @@ import {
 } from "../controller/onboarding"; // Update the path accordingly
 import {
   createProfessionalApplication,
+  getProfessionalApplication,
   getAllProfessionalApplicationsWithStatus,
   deleteProfessionalApplication,
   deleteMultipleProfessionalApplications,
@@ -41,6 +42,9 @@ router.get(
   "/professional-applications",
   getAllProfessionalApplicationsWithStatus
 );
+
+// Route to get a single Professional application
+router.get("/professional-applications/:id", getProfessionalApplication);
 
 // Route to verify OTP for email authentication
 router.post("/verify-otp", verifyOTPEmailAuth);
