@@ -111,6 +111,7 @@ export const loginUser = async (req: AuthRequest, res: Response) => {
       return res.json({ error: "Email and password are required" });
 
     const user = await userRepository.findOneBy({ email });
+    console.log("user found:", user);
 
     if (!user) {
       return res.json({ error: "User not found, try again" });
