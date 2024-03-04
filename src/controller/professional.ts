@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const secretKey: string = process.env.JWT_SECRET || "your_secret_key"; // Replace 'your_secret_key' with your actual secret key
+const secretKey: string = process.env.JWT_SECRET || 'your_secret_key'
 
 export const createProfessionalApplication = async (
   req: Request,
@@ -67,21 +67,7 @@ export const createProfessionalApplication = async (
       return res.status(400).json({ errors: errors.array() });
     }
 
-    // Validate passport upload size (maximum of 2MB and minimum of 100KB)
-    const passportUpload = req.body.passportUpload;
-    const minSize = 100 * 1024; // 100KB
-    const maxSize = 2 * 1024 * 1024; // 2MB
-
-    if (
-      !Buffer.isBuffer(passportUpload) ||
-      passportUpload.length < minSize ||
-      passportUpload.length > maxSize
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Passport upload size must be between 100KB and 2MB" });
-    }
-
+    
     // Fetch user from database
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
@@ -99,6 +85,7 @@ export const createProfessionalApplication = async (
       employmentDetails,
       fundingInformation,
       disability,
+      passportUpload,
       englishLanguageQualification,
     } = req.body;
 
