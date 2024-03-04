@@ -119,7 +119,7 @@ export const createProfessionalApplication = async (
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-// fetching all application and adding a status field of pending
+
 // get a single user application
 export const getProfessionalApplication = async (
   req: Request,
@@ -164,6 +164,7 @@ export const getProfessionalApplication = async (
   }
 };
 
+// fetching all application and adding a status field of pending
 export const getAllProfessionalApplicationsWithStatus = async (
   req: Request,
   res: Response
@@ -201,32 +202,6 @@ export const getAllProfessionalApplications = async (
     return res.status(200).json(professionalApplications);
   } catch (error) {
     console.error("Error fetching professional applications:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-};
-
-// fetching a single user's application
-
-export const getApplicationsByUserId = async (
-  req: Request,
-  res: Response
-) => {
-  try {
-    const { id } = req.params;
-
-    // Check if userId is provided
-    if (!id) {
-      return res.status(400).json({ error: "User ID is required" });
-    }
-
-    // Fetch applications by user ID
-    const applications = await AppDataSource.getRepository(ProfessionalApplication).find({
-      where: { user: { id } }
-    });
-
-    return res.status(200).json(applications);
-  } catch (error) {
-    console.error("Error fetching applications by user ID:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

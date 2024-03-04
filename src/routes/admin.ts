@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-    getAllProfessionalApplicationsWithStatus, getAllProfessionalApplications, getApplicationsByUserId
+    getAllProfessionalApplicationsWithStatus, getAllProfessionalApplications, getProfessionalApplication
 } from "../controller/professional";
 
 const router = Router();
@@ -10,5 +10,7 @@ router.get(
     "/professional-applications-pending",
     getAllProfessionalApplicationsWithStatus
 );
+// Route to get all Professional applications regardless of status
 router.get("/professional-applications", getAllProfessionalApplications);
-router.get("/professional-applications/:id", getApplicationsByUserId);
+// Route to get a single Professional application
+router.get("/professional-applications/:id", getProfessionalApplication);
