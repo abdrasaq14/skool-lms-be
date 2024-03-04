@@ -27,6 +27,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
       phoneNumber,
       password,
       countryOfResidence,
+      isAdmin
     } = req.body;
     if (
       !firstName ||
@@ -34,7 +35,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
       !email ||
       !phoneNumber ||
       !password ||
-      !countryOfResidence
+      !countryOfResidence 
     )
       return res.json({ error: "All fields are required" });
 
@@ -52,6 +53,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
         phoneNumber,
         password: hashedPassword,
         countryOfResidence,
+        isAdmin
       });
 
       await userRepository.save(newUser);
@@ -126,8 +128,11 @@ export const loginUser = async (req: AuthRequest, res: Response) => {
         const token = jwt.sign({ id: user.id }, secret, {
           expiresIn: "1h",
         });
-
-        res.json({ message: "User logged in successfully", token });
+        if(user.isAdmin){
+          res.json({ adminSuccessMessage: "Admin logged in successfully", token})
+        }else{
+          res.json({ message: "User logged in successfully", token });
+        }
       }
     }
   } catch (error) {
