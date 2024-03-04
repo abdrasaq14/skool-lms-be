@@ -13,8 +13,11 @@ import {
 } from "../controller/onboarding"; // Update the path accordingly
 import {
   createProfessionalApplication,
+  getProfessionalApplication,
   deleteProfessionalApplication,
   deleteMultipleProfessionalApplications,
+  approveProfessionalApplication,
+  rejectProfessionalApplication
 } from "../controller/professional";
 
 const router = Router();
@@ -37,6 +40,9 @@ router.post("/professional-application", createProfessionalApplication);
 
 
 
+// Route to get a single Professional application
+router.get("/professional-applications/:id", getProfessionalApplication);
+
 // Route to verify OTP for email authentication
 router.post("/verify-otp", verifyOTPEmailAuth);
 
@@ -50,6 +56,12 @@ router.delete(
   "/professional-applications",
   deleteMultipleProfessionalApplications
 );
+
+// Route to approve a professional application
+router.put("/approve-application/:id", approveProfessionalApplication);
+
+// Route to reject a professional application
+router.put("/reject-application/:id", rejectProfessionalApplication);
 
 /* GET users listing. */
 
