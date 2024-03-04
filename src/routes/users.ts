@@ -11,7 +11,12 @@ import {
   createApplication,
   updateOnboarding,
 } from "../controller/onboarding"; // Update the path accordingly
-import { createProfessionalApplication, getAllProfessionalApplicationsWithStatus } from "../controller/professional";
+import {
+  createProfessionalApplication,
+  getAllProfessionalApplicationsWithStatus,
+  deleteProfessionalApplication,
+  deleteMultipleProfessionalApplications,
+} from "../controller/professional";
 
 const router = Router();
 
@@ -21,7 +26,6 @@ router.post("/forgotpassword", resetPassword);
 router.post("/forgotpassword/:token", resetPasswordToken);
 // Route for creating a new course
 router.post("/:userId/courses", createCourse);
-
 
 // Route for creating a new application
 router.post("/:userId/applications", createApplication);
@@ -33,9 +37,24 @@ router.put("/:userId/onboarding", updateOnboarding);
 router.post("/professional-application", createProfessionalApplication);
 
 // Route to get all Professional applications with the status
-router.get("/professional-applications", getAllProfessionalApplicationsWithStatus);
+router.get(
+  "/professional-applications",
+  getAllProfessionalApplicationsWithStatus
+);
 
+// Route to verify OTP for email authentication
 router.post("/verify-otp", verifyOTPEmailAuth);
+
+// Route to delete a professional application
+
+router.delete("/professional-application/:id", deleteProfessionalApplication);
+
+// Route to delete multiple professional applications
+
+router.delete(
+  "/professional-applications",
+  deleteMultipleProfessionalApplications
+);
 
 /* GET users listing. */
 
