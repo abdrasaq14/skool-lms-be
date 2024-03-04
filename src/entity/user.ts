@@ -46,6 +46,9 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
+  @Column({default: false})
+  isAdmin: boolean;
+
   @Column({ nullable: true, type: "varchar" })
   resetToken: string | null;
 
@@ -70,7 +73,8 @@ export class User {
     otp: string,
     otpSecret: string,
     otpExpiration: Date,
-    isVerified: boolean
+    isVerified: boolean,
+    isAdmin: boolean
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
@@ -82,6 +86,7 @@ export class User {
     this.otpSecret = otpSecret;
     this.otpExpiration = otpExpiration;
     this.isVerified = isVerified;
+    this.isAdmin = isAdmin;
     this.resetToken = null;
     this.resetTokenExpires = null;
     this.createdAt = createdAt;

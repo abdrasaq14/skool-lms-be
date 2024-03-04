@@ -3,7 +3,7 @@ import { User } from "../entity/user";
 import { AppDataSource } from "../database/data-source";
 import jwt from "jsonwebtoken";
 
-const secret: string = process.env.secret ?? "";
+const secret: string = process.env.JWT_SECRET ?? "";
 
 export async function checkAndVerifyToken(
   req: Request,
@@ -16,13 +16,24 @@ export async function checkAndVerifyToken(
     if (!token) {
       res.json({ noTokenError: "Unauthorized - Token not provided" });
     } else {
-      const decoded = jwt.verify(token, secret) as { loginkey: string };
-      const user = await userRepository.findOne({
-        where: { id: decoded.loginkey },
-      });
-      res.json({ user });
+      const decoded = jwt.verify(token, secret) as { id: string };
 
-      // req.student = { studentId: student?.dataValues.studentId }
+      const userInfo = await userRepository.findOne({
+        where: { id: decoded.id },
+      });
+
+      if (userInfo) {
+        const user = {
+          firstName: userInfo.firstName,
+          lastName: userInfo.lastName,
+          email: userInfo.email,
+          phone: userInfo.phoneNumber,
+          country: userInfo.countryOfResidence,
+        };
+
+        console.log(`User: ${user}`);
+        res.json({ user });
+      }
     }
   } catch (error: any) {
     if (error.name === "TokenExpiredError") {
