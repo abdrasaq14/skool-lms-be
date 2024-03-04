@@ -17,6 +17,8 @@ import {
   getAllProfessionalApplicationsWithStatus,
   deleteProfessionalApplication,
   deleteMultipleProfessionalApplications,
+  approveProfessionalApplication,
+  rejectProfessionalApplication
 } from "../controller/professional";
 
 const router = Router();
@@ -59,6 +61,12 @@ router.delete(
   "/professional-applications",
   deleteMultipleProfessionalApplications
 );
+
+// Route to approve a professional application
+router.put("/approve-application/:id", approveProfessionalApplication);
+
+// Route to reject a professional application
+router.put("/reject-application/:id", rejectProfessionalApplication);
 
 /* GET users listing. */
 

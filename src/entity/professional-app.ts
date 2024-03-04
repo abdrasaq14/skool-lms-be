@@ -12,6 +12,9 @@ export class ProfessionalApplication {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Column({ default: 'pending' }) // Assuming 'pending' is the default status
+  status!: string;
+
   @OneToOne(() => User, (user) => user.id)
   @JoinColumn({ name: "applicantId" })
   user!: User;
@@ -46,4 +49,5 @@ export class ProfessionalApplication {
 
   @Column({ type: "boolean" })
   englishLanguageQualification!: boolean;
+
 }
