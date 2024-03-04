@@ -211,3 +211,76 @@ export const deleteMultipleProfessionalApplications = async (
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+// Admin to approve professional application
+
+export const approveProfessionalApplication = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const professionalApplicationRepository = AppDataSource.getRepository(
+      ProfessionalApplication
+    );
+
+    const applicationToApprove = await professionalApplicationRepository.findOne(
+      {
+        where: { id },
+      }
+    );
+
+    if (!applicationToApprove) {
+      return res
+        .status(400)
+        .json({ error: "Professional application not found" });
+    }
+
+    applicationToApprove.status = "Approved";
+    await professionalApplicationRepository.save(applicationToApprove);
+
+    return res
+      .status(200)
+      .json({ message: "Application approved successfully" });
+  } catch (error) {
+    console.error("Error approving application:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Admin to reject professional application
+
+export const rejectProfessionalApplication = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const professionalApplicationRepository = AppDataSource.getRepository(
+      ProfessionalApplication
+    );
+
+    const applicationToReject = await professionalApplicationRepository.findOne({
+      where: { id },
+    });
+
+    if (!applicationToReject) {
+      return res
+        .status(400)
+        .json({ error: "Professional application not found" });
+    }
+
+    applicationToReject.status = "Rejected";
+    await professionalApplicationRepository.save(applicationToReject);
+
+    return res
+      .status(200)
+      .json({ message: "Application rejected successfully" });
+  } catch (error) {
+    console.error("Error rejecting application:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
