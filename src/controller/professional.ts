@@ -120,6 +120,50 @@ export const createProfessionalApplication = async (
   }
 };
 
+// get a single user application
+export const getProfessionalApplication = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+
+    const professionalApplication = await AppDataSource.getRepository(
+      ProfessionalApplication
+    ).findOne({
+      where: { id },
+      relations: ["user"], // Specify the relation to fetch the associated user
+    });
+
+    if (!professionalApplication) {
+      return res
+        .status(404)
+        .json({ error: "Professional application not found" });
+    }
+
+    // Destructure user details from the associated user
+    const { firstName, lastName, email, phoneNumber, countryOfResidence } =
+      professionalApplication.user;
+
+    // Include user details in the response
+    const responsePayload = {
+      ...professionalApplication,
+      user: {
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        countryOfResidence,
+      },
+    };
+
+    return res.status(200).json(responsePayload);
+  } catch (error) {
+    console.error("Error fetching professional application:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 export const getAllProfessionalApplicationsWithStatus = async (
   req: Request,
   res: Response
