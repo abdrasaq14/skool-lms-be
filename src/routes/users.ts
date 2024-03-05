@@ -16,7 +16,6 @@ import {
 import {
   createProfessionalApplication,
   getProfessionalApplication,
-  getAllProfessionalApplicationsWithStatus,
   deleteProfessionalApplication,
   deleteMultipleProfessionalApplications,
   approveProfessionalApplication,
@@ -43,11 +42,7 @@ router.put("/:userId/onboarding", updateOnboarding);
 // Route for creating a new professional application
 router.post("/professional-application", createProfessionalApplication);
 
-// Route to get all Professional applications with the status
-router.get(
-  "/professional-applications",
-  getAllProfessionalApplicationsWithStatus
-);
+
 
 // Route to get a single Professional application
 router.get("/professional-applications/:id", getProfessionalApplication);
