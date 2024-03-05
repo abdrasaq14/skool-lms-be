@@ -17,6 +17,7 @@ import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
 import protectedRouter from "./routes/protectedRoutes";
 import { request } from "http";
+import adminRouter from "./routes/admin";
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ app.use(express.static("public"));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/admin", adminRouter);
 app.use("/protected-route", protectedRouter);
 
 // catch 404 and forward to error handler
