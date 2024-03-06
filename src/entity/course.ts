@@ -1,11 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { User } from './user'; // Update the import path if necessary
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
 
 @Entity()
 export class Course {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @Column({ nullable: true })
+  userId?: string;
   @Column({ nullable: false })
   courseType: string;
 
@@ -21,9 +23,7 @@ export class Course {
   @Column({ nullable: false })
   entryMonth: number;
 
-  @OneToOne(() => User)
-  @JoinColumn()
-  user: User;
+
 
   constructor(
     courseType: string,
@@ -31,13 +31,13 @@ export class Course {
     courseSearch: string,
     entryYear: number,
     entryMonth: number,
-    user: User
+    userId: string
   ) {
     this.courseType = courseType;
     this.studyMode = studyMode;
     this.courseSearch = courseSearch;
     this.entryYear = entryYear;
     this.entryMonth = entryMonth;
-    this.user = user;
+    this.userId = userId;
   }
 }
