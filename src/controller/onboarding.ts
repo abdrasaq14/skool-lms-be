@@ -2,134 +2,67 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../database/data-source';
 import { User } from '../entity/user';
 import { Course } from '../entity/course';
-// import { Qualification } from '../entity/qualification';
 import { Application } from '../entity/application';
 import jwt from "jsonwebtoken";
 
-const secret:string = process.env.JWT_SECRET!
+const secret:string = process.env.JWT_SECRET!;
 
-const formData: Record<string, any> = {};
-
-export const updateOnboarding = async (req: Request, res: Response) => {
+export const createOnboarding = async (req: Request, res: Response) => {
     try {
         // Extract the user id from the request parameters
-      const token = req.headers.authorization?.split(" ")[1];
+        const token = req.headers.authorization?.split(" ")[1];
 
-      if (!token) {
-        res.json({ noTokenError: "Unauthorized - Token not available" });
-      } else {
-        const decoded = jwt.verify(token, secret) as { id: string };
-        const userId = decoded.id
-
-
-        // Extract profile data from the request body
-        const { course, application } = req.body;
-
-        // Store the form data for the current stage
-        formData[userId] = { ...formData[userId], ...course, ...application};
-
-        // If it's not the last stage, return a success message
-        if (formData[userId].stage < 2) {
-            return res.status(200).json({ message: 'Data saved successfully' });
+        if (!token) {
+            return res.json({ noTokenError: "Unauthorized - Token not available" });
         }
 
-        // Get the user repository
-        const userRepository = AppDataSource.getRepository(User);
+        const decoded = jwt.verify(token, secret) as { id: string };
+        const userId = decoded.id;
+
+        // Extract onboarding data from the request body
+        const { course } = req.body;
+        const { courseType, studyMode, courseSearch, entryYear, entryMonth, gender, countryOfBirth, nationality } = course;
+
+        // Check if courseType is present and not null
+        if (!courseType) {
+            return res.status(400).json({ error: 'Course type is required' });
+        }
 
         // Find the user in the database
+        const userRepository = AppDataSource.getRepository(User);
         const user = await userRepository.findOne({ where: { id: userId } });
 
-        // Check if the user exists
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Update the user's onboarding status with the final form data
-        const finalFormData = formData[userId];
-
-        // Create and associate Course entity
+        // Create Course and Application entities
         const courseEntity = new Course(
-            finalFormData.courseType,
-            finalFormData.studyMode,
-            finalFormData.courseSearch,
-            finalFormData.entryYear,
-            finalFormData.entryMonth,
+            courseType,
+            studyMode,
+            courseSearch,
+            entryYear,
+            entryMonth,
             userId
-            
         );
 
-        // Create and associate Application entity
         const applicationEntity = new Application(
-            finalFormData.gender,
-            finalFormData.countryOfBirth,
-            finalFormData.nationality,
+            gender,
+            countryOfBirth,
+            nationality,
             userId
         );
 
-        // Save the entities
-        await userRepository.save(user);
-        await userRepository.save(courseEntity);
-        await userRepository.save(applicationEntity);
+        const courseRepository = AppDataSource.getRepository(Course);
+        const applicationRepository = AppDataSource.getRepository(Application);
 
-        // Clear the form data after submission
-        delete formData[userId];
+        await courseRepository.save(courseEntity);
+        await applicationRepository.save(applicationEntity);
 
         // Return a success message
         return res.status(200).json({ message: 'Onboarding completed successfully' });
-    } } catch (error) {
+    } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-
-
 };
-
-
-// export const createCourse = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.params.userId;
-//     const user = await AppDataSource.getRepository(User).findOne({ where: { id: userId } });
-
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-
-//     const courseRepository = AppDataSource.getRepository(Course);
-
-//     const { courseType, studyMode, courseSearch, entryYear, entryMonth } = req.body;
-
-//     const newCourse = courseRepository.create({ user, courseType, studyMode, courseSearch, entryYear, entryMonth });
-
-//     const savedCourse = await courseRepository.save(newCourse);
-
-//     res.status(201).json(savedCourse);
-//   } catch (error) {
-//     console.error('Error creating course:', error);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
-
-// export const createApplication = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.params.userId;
-//     const user = await AppDataSource.getRepository(User).findOne({ where: { id: userId } });
-
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-
-//     const applicationRepository = AppDataSource.getRepository(Application);
-
-//     const { gender, countryOfBirth, nationality } = req.body;
-
-//     const newApplication = applicationRepository.create({ user, gender, countryOfBirth, nationality });
-
-//     const savedApplication = await applicationRepository.save(newApplication);
-
-//     res.status(201).json(savedApplication);
-//   } catch (error) {
-//     console.error('Error creating application:', error);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
-

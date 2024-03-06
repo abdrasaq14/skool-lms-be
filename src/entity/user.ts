@@ -5,7 +5,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne, JoinColumn
 } from "typeorm";
+import { Course } from "./course";
+import { Application } from "./application";
+
 
 @Entity()
 export class User {
@@ -60,6 +64,16 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+   // Define one-to-one relationship with Course entity
+   @OneToOne(() => Course)
+   @JoinColumn()
+   course?: Course;
+ 
+   // Define one-to-one relationship with Application entity
+   @OneToOne(() => Application)
+   @JoinColumn()
+   application?: Application;
 
   constructor(
     firstName: string,
