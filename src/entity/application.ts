@@ -1,19 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
-// import { User } from './user';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn} from 'typeorm';
+import { User } from './user';
 
 @Entity()
 export class Application {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // @OneToOne(() => User)
-  // @JoinColumn()
-  // userId: string
+  @OneToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: "userId" })
+  user!: User;
 
 
 
-  @Column({ nullable: true })
-  userId?: string;
+  // @Column({ nullable: true })
+  // userId?: string;
 
   @Column({ nullable: true })
   gender?: string;
@@ -24,10 +24,15 @@ export class Application {
   @Column({ nullable: true })
   nationality?: string;
 
-  constructor(userId: string, gender?: string, countryOfBirth?: string, nationality?: string) {
-    this.userId = userId;
+  constructor(
+    gender: string,
+    countryOfBirth: string,
+    nationality: string,
+    userId: string
+  ) {
     this.gender = gender;
     this.countryOfBirth = countryOfBirth;
     this.nationality = nationality;
   }
+
 }

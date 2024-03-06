@@ -9,7 +9,7 @@ import {
   editUserDetails,
 } from "../controller/user";
 import {
-  updateOnboarding,
+  createOnboarding,
 } from "../controller/onboarding"; // Update the path accordingly
 import {
   createProfessionalApplication,
@@ -31,7 +31,7 @@ router.put("/edit-profile", editUserDetails);
 
 
 // Route for updating onboarding details
-router.post("/onboarding", updateOnboarding);
+router.post("/onboarding", createOnboarding);
 
 // Route for creating a new professional application
 router.post("/professional-application", createProfessionalApplication);
