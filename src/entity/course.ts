@@ -1,18 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
-import { User } from './user';
-
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { User } from "./user";
 
 @Entity()
 export class Course {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @OneToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: "userId" })
-  user!: User;
+  @Column({ nullable: false })
+  userId?: string;
 
-  // @Column({ nullable: true })
-  // userId?: string;
   @Column({ nullable: false })
   courseType: string;
 
@@ -23,18 +19,16 @@ export class Course {
   courseSearch: string;
 
   @Column({ nullable: false })
-  entryYear: number;
+  entryYear: string;
 
   @Column({ nullable: false })
   entryMonth: string;
-
-
 
   constructor(
     courseType: string,
     studyMode: string,
     courseSearch: string,
-    entryYear: number,
+    entryYear: string,
     entryMonth: string,
     userId: string
   ) {
@@ -43,5 +37,6 @@ export class Course {
     this.courseSearch = courseSearch;
     this.entryYear = entryYear;
     this.entryMonth = entryMonth;
+    this.userId = userId;
   }
 }

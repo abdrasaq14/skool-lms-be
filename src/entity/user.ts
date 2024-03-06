@@ -5,15 +5,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne, JoinColumn
 } from "typeorm";
-import { Course } from "./course";
-import { Application } from "./application";
-
 
 @Entity()
 export class User {
-  update(arg0: { otpSecret: string; otp: string; otpExpiration: Date; }) {
+  update(arg0: { otpSecret: string; otp: string; otpExpiration: Date }) {
     throw new Error("Method not implemented.");
   }
   @PrimaryGeneratedColumn("uuid")
@@ -50,7 +46,7 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column({default: false})
+  @Column({ default: false })
   isAdmin: boolean;
 
   @Column({ nullable: true, type: "varchar" })
@@ -64,16 +60,6 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-   // Define one-to-one relationship with Course entity
-   @OneToOne(() => Course)
-   @JoinColumn()
-   course?: Course;
- 
-   // Define one-to-one relationship with Application entity
-   @OneToOne(() => Application)
-   @JoinColumn()
-   application?: Application;
 
   constructor(
     firstName: string,
