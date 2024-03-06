@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { User } from "../entity/user";
+import { Course } from "../entity/course";
 import { AppDataSource } from "../database/data-source";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -106,6 +107,7 @@ export const loginUser = async (req: AuthRequest, res: Response) => {
 
   try {
     const userRepository = AppDataSource.getRepository(User);
+    const courseRepository = AppDataSource.getRepository(Course);
 
     const { email, password } = req.body;
 
@@ -116,25 +118,40 @@ export const loginUser = async (req: AuthRequest, res: Response) => {
 
     if (!user) {
       return res.json({ error: "User not found, try again" });
-    } else {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+    }
 
-      if (!isPasswordValid) {
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      res.json({
+        error: "Invalid password",
+      });
+    } else {
+      const token = jwt.sign({ id: user.id }, secret, {
+        expiresIn: "1h",
+      });
+
+      if (user.isAdmin) {
         res.json({
-          error: "Invalid password",
+          adminSuccessMessage: "Admin logged in successfully",
+          token,
         });
       } else {
-        const token = jwt.sign({ id: user.id }, secret, {
-          expiresIn: "1h",
+        const isOnboarded = await courseRepository.findOneBy({
+          userId: user.id,
         });
-        if (user.isAdmin) {
-          res.json({
-            adminSuccessMessage: "Admin logged in successfully",
+
+        if (!isOnboarded) {
+          return res.json({
+            userNotOnboarded: "User has not completed onboarding",
             token,
           });
-        } else {
-          res.json({ message: "User logged in successfully", token });
         }
+
+        res.json({
+          userOnboarded: "User logged in successfully",
+          token,
+        });
       }
     }
   } catch (error) {

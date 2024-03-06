@@ -13,5 +13,5 @@
 https://skool-lms-server.onrender.com
 
 # An admin account has been added
-Email: samuelfagbohun996@gmail.com
+Email: samuelfagbohun041@gmail.com
 Password: samuel123
