@@ -322,12 +322,12 @@ export const changePassword = async (
 ): Promise<void> => {
   const userRepository = AppDataSource.getRepository(User);
 
-  const { oldPassword, newPassword } = req.body;
+  const { currentPassword, newPassword } = req.body;
 
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    res.json({ noTokenError: "Unauthorized - Token not provided" });
+    res.json({ noTokenError: "Unauthorized - Token not available" });
   } else {
     const decoded = jwt.verify(token, secret) as { id: string };
 
@@ -336,13 +336,18 @@ export const changePassword = async (
     });
 
     if (!user) {
-      res.json({ errorMessage: "User not found" });
+      res.json({ userNotFoundError: "User not found" });
       return;
     } else {
-      const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+      const isPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
 
       if (!isPasswordValid) {
-        res.json({ errorMessage: "Old password is incorrect, try again" });
+        res.json({
+          incorrectPasswordError: "Current password is incorrect, try again",
+        });
         return;
       }
 
@@ -374,7 +379,7 @@ export const editUserDetails = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      res.json({ errorMessage: "User not found" });
+      res.json({ userNotFoundError: "User not found" });
       return;
     } else {
       user.countryOfResidence = countryOfResidence;
