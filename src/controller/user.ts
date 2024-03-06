@@ -27,7 +27,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
       phoneNumber,
       password,
       countryOfResidence,
-      isAdmin
+      isAdmin,
     } = req.body;
     if (
       !firstName ||
@@ -35,7 +35,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
       !email ||
       !phoneNumber ||
       !password ||
-      !countryOfResidence 
+      !countryOfResidence
     )
       return res.json({ error: "All fields are required" });
 
@@ -53,7 +53,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
         phoneNumber,
         password: hashedPassword,
         countryOfResidence,
-        isAdmin
+        isAdmin,
       });
 
       await userRepository.save(newUser);
@@ -113,7 +113,6 @@ export const loginUser = async (req: AuthRequest, res: Response) => {
       return res.json({ error: "Email and password are required" });
 
     const user = await userRepository.findOneBy({ email });
-    console.log("user found:", user);
 
     if (!user) {
       return res.json({ error: "User not found, try again" });
@@ -128,9 +127,12 @@ export const loginUser = async (req: AuthRequest, res: Response) => {
         const token = jwt.sign({ id: user.id }, secret, {
           expiresIn: "1h",
         });
-        if(user.isAdmin){
-          res.json({ adminSuccessMessage: "Admin logged in successfully", token})
-        }else{
+        if (user.isAdmin) {
+          res.json({
+            adminSuccessMessage: "Admin logged in successfully",
+            token,
+          });
+        } else {
           res.json({ message: "User logged in successfully", token });
         }
       }
@@ -311,5 +313,81 @@ export const verifyOTPEmailAuth = async (
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const changePassword = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  const userRepository = AppDataSource.getRepository(User);
+
+  const { currentPassword, newPassword } = req.body;
+
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    res.json({ noTokenError: "Unauthorized - Token not available" });
+  } else {
+    const decoded = jwt.verify(token, secret) as { id: string };
+
+    const user = await userRepository.findOne({
+      where: { id: decoded.id },
+    });
+
+    if (!user) {
+      res.json({ userNotFoundError: "User not found" });
+      return;
+    } else {
+      const isPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
+
+      if (!isPasswordValid) {
+        res.json({
+          incorrectPasswordError: "Current password is incorrect, try again",
+        });
+        return;
+      }
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+
+      user.password = hashedNewPassword;
+
+      await userRepository.save(user);
+
+      res.json({ successMessage: "Password updated successfully" });
+    }
+  }
+};
+
+export const editUserDetails = async (req: Request, res: Response) => {
+  const userRepository = AppDataSource.getRepository(User);
+
+  const { phoneNumber, countryOfResidence } = req.body;
+
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    res.json({ noTokenError: "Unauthorized - Token not provided" });
+  } else {
+    const decoded = jwt.verify(token, secret) as { id: string };
+
+    const user = await userRepository.findOne({
+      where: { id: decoded.id },
+    });
+
+    if (!user) {
+      res.json({ userNotFoundError: "User not found" });
+      return;
+    } else {
+      user.countryOfResidence = countryOfResidence;
+      user.phoneNumber = phoneNumber;
+
+      await userRepository.save(user);
+
+      res.json({ successMessage: "Profile updated successfully" });
+    }
   }
 };

@@ -5,6 +5,8 @@ import {
   verifyOTPEmailAuth,
   resetPassword,
   resetPasswordToken,
+  changePassword,
+  editUserDetails,
 } from "../controller/user";
 import {
   createCourse,
@@ -17,7 +19,7 @@ import {
   deleteProfessionalApplication,
   deleteMultipleProfessionalApplications,
   approveProfessionalApplication,
-  rejectProfessionalApplication
+  rejectProfessionalApplication,
 } from "../controller/professional";
 
 const router = Router();
@@ -26,6 +28,8 @@ router.post("/register", createUser);
 router.post("/login", loginUser);
 router.post("/forgotpassword", resetPassword);
 router.post("/forgotpassword/:token", resetPasswordToken);
+router.post("/change-password", changePassword);
+router.put("/edit-profile", editUserDetails);
 // Route for creating a new course
 router.post("/:userId/courses", createCourse);
 

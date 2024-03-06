@@ -31,7 +31,6 @@ export async function checkAndVerifyToken(
           country: userInfo.countryOfResidence,
         };
 
-        console.log(`User: ${user}`);
         res.json({ user });
       }
     }
