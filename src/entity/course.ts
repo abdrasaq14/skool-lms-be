@@ -6,7 +6,7 @@ export class Course {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   userId?: string;
 
   @Column({ nullable: false })
