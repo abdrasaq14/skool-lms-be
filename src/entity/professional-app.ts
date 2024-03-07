@@ -6,6 +6,7 @@ import {
   OneToOne,
 } from "typeorm";
 import { User } from "./user";
+import { Course } from "./course";
 
 @Entity()
 export class ProfessionalApplication {
@@ -15,8 +16,12 @@ export class ProfessionalApplication {
   @Column({ default: 'pending' }) // Assuming 'pending' is the default status
   status!: string;
 
+  @OneToOne(() => Course, (course) => course.id)
+  @JoinColumn({ name: "courseId" })
+  course!: Course;
+
   @OneToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: "applicantId" })
+  @JoinColumn({ name: "userId" })
   user!: User;
 
   @Column({ type: "text" })

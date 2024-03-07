@@ -2,6 +2,7 @@ import jwt, { Jwt, JwtPayload } from "jsonwebtoken";
 import { Request, Response } from "express";
 import { validationResult, check } from "express-validator";
 import { User } from "../entity/user";
+import { Course } from "../entity/course";
 import { ProfessionalApplication } from "../entity/professional-app";
 import { AppDataSource } from "../database/data-source";
 import dotenv from "dotenv";
@@ -132,7 +133,8 @@ export const getProfessionalApplication = async (
       ProfessionalApplication
     ).findOne({
       where: { id },
-      relations: ["user"], // Specify the relation to fetch the associated user
+      relations: ["user"],
+     
     });
 
     if (!professionalApplication) {
