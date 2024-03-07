@@ -14,4 +14,7 @@ export const AppDataSource = new DataSource({
   entities: [User, Course, Application, ProfessionalApplication],
   subscribers: [],
   migrations: [],
+  extra: {
+    timezone: "local",
+  },
 });

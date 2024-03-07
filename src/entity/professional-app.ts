@@ -4,6 +4,7 @@ import {
   Column,
   JoinColumn,
   OneToOne,
+  CreateDateColumn,
 } from "typeorm";
 import { User } from "./user";
 
@@ -12,7 +13,7 @@ export class ProfessionalApplication {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ default: 'pending' }) // Assuming 'pending' is the default status
+  @Column({ default: "pending" })
   status!: string;
 
   @OneToOne(() => User, (user) => user.id)
@@ -50,4 +51,6 @@ export class ProfessionalApplication {
   @Column({ type: "boolean" })
   englishLanguageQualification!: boolean;
 
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  createdAt!: Date;
 }
