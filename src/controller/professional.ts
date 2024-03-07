@@ -2,6 +2,7 @@ import jwt, { Jwt, JwtPayload } from "jsonwebtoken";
 import { Request, Response } from "express";
 import { validationResult, check } from "express-validator";
 import { User } from "../entity/user";
+import { Course } from "../entity/course";
 import { ProfessionalApplication } from "../entity/professional-app";
 import { AppDataSource } from "../database/data-source";
 import dotenv from "dotenv";
@@ -131,7 +132,8 @@ export const getProfessionalApplication = async (
       ProfessionalApplication
     ).findOne({
       where: { id },
-      relations: ["user"], // Specify the relation to fetch the associated user
+      relations: ["user"],
+     
     });
 
     if (!professionalApplication) {
@@ -227,19 +229,15 @@ export const deleteProfessionalApplication = async (
     );
 
     if (!applicationToDelete) {
-      return res
-        .status(400)
-        .json({ error: "Professional application not found" });
+      return res.json({ error: "Professional application not found" });
     }
 
     await professionalApplicationRepository.remove(applicationToDelete);
 
-    return res
-      .status(200)
-      .json({ message: "Professional application deleted sucessfully" });
+    return res.json({ message: "Professional application deleted sucessfully" });
   } catch (error) {
     console.error("Error deleting professional application:", error);
-    return res.status(500).json({ erreo: "Internal server Error" });
+    return res.json({ erreo: "Internal server Error" });
   }
 };
 
@@ -286,19 +284,16 @@ export const approveProfessionalApplication = async (
 
     if (!applicationToApprove) {
       return res
-        .status(400)
         .json({ error: "Professional application not found" });
     }
 
-    applicationToApprove.status = "Approved";
+    applicationToApprove.status = "accepted";
     await professionalApplicationRepository.save(applicationToApprove);
 
-    return res
-      .status(200)
-      .json({ message: "Application approved successfully" });
+    return res.json({ message: "Application approved successfully" });
   } catch (error) {
     console.error("Error approving application:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.json({ error: "Internal server error" });
   }
 };
 
@@ -322,19 +317,15 @@ export const rejectProfessionalApplication = async (
     );
 
     if (!applicationToReject) {
-      return res
-        .status(400)
-        .json({ error: "Professional application not found" });
+      return res .json({ error: "Professional application not found" });
     }
 
     applicationToReject.status = "Rejected";
     await professionalApplicationRepository.save(applicationToReject);
 
-    return res
-      .status(200)
-      .json({ message: "Application rejected successfully" });
+    return res.json({ message: "Application rejected successfully" });
   } catch (error) {
     console.error("Error rejecting application:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.json({ error: "Internal server error" });
   }
 };
