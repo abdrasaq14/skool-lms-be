@@ -4,24 +4,20 @@ import {
   Column,
   JoinColumn,
   OneToOne,
+  CreateDateColumn,
 } from "typeorm";
 import { User } from "./user";
-import { Course } from "./course";
 
 @Entity()
 export class ProfessionalApplication {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ default: 'pending' }) // Assuming 'pending' is the default status
+  @Column({ default: "pending" })
   status!: string;
 
-  @OneToOne(() => Course, (course) => course.id)
-  @JoinColumn({ name: "courseId" })
-  course!: Course;
-
   @OneToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: "applicantId" })
   user!: User;
 
   @Column({ type: "text" })
@@ -55,4 +51,6 @@ export class ProfessionalApplication {
   @Column({ type: "boolean" })
   englishLanguageQualification!: boolean;
 
+  @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  createdAt!: Date;
 }
