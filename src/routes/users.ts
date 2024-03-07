@@ -8,9 +8,7 @@ import {
   changePassword,
   editUserDetails,
 } from "../controller/user";
-import {
-  createOnboarding,
-} from "../controller/onboarding"; // Update the path accordingly
+import { createOnboarding } from "../controller/onboarding"; // Update the path accordingly
 import {
   createProfessionalApplication,
   getProfessionalApplication,
@@ -29,14 +27,11 @@ router.post("/forgotpassword/:token", resetPasswordToken);
 router.post("/change-password", changePassword);
 router.put("/edit-profile", editUserDetails);
 
-
 // Route for updating onboarding details
 router.post("/onboarding", createOnboarding);
 
 // Route for creating a new professional application
 router.post("/professional-application", createProfessionalApplication);
-
-
 
 // Route to get a single Professional application
 router.get("/professional-applications/:id", getProfessionalApplication);
