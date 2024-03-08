@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { validationResult, check } from "express-validator";
 import { User } from "../entity/user";
 import { ProfessionalApplication } from "../entity/professional-app";
+import { Course } from "../entity/course";
 import { AppDataSource } from "../database/data-source";
 import dotenv from "dotenv";
 
@@ -337,3 +338,34 @@ export const rejectProfessionalApplication = async (
     return res.status(500).json({ error: "Internal server error" });
   }
 }
+
+
+// Function to fetch user professional applications and courses
+export const getUserProfessionalData = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    // Fetch professional applications using ProfessionalApplication entity
+    const professionalApplicationRepository = AppDataSource.getRepository(ProfessionalApplication);
+    const professionalApplications = await professionalApplicationRepository.find({
+      where: { id },
+    });
+
+    // Fetch courses using Course entity
+    const courseRepository = AppDataSource.getRepository(Course);
+    const courses = await courseRepository.find({
+      where: { id },
+    });
+
+    const userProfessionalData = {
+      professional_applications: professionalApplications,
+      courses: courses,
+    };
+
+    res.json(userProfessionalData);
+  } catch (error) {
+    console.error('Error fetching user professional data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
