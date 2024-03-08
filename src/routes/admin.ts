@@ -15,4 +15,6 @@ router.get("/professional-applications", getAllProfessionalApplications);
 // Route to get a single Professional application
 router.get("/professional-applications/:id", getProfessionalApplication);
 
+
+
 export default router;

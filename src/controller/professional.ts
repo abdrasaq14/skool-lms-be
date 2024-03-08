@@ -90,6 +90,7 @@ export const createProfessionalApplication = async (
     const professionalApplicationRepository = AppDataSource.getRepository(
       ProfessionalApplication
     );
+
     const newProfessionalApplication = professionalApplicationRepository.create(
       {
         user,
@@ -184,10 +185,10 @@ export const getAllProfessionalApplicationsWithStatus = async (
       })
     );
 
-    return res.status(200).json(applicationsWithStatus);
+    return res.json(applicationsWithStatus);
   } catch (error) {
     console.error("Error fetching professional applications:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.json({ error: "Internal server error" });
   }
 };
 
@@ -200,12 +201,28 @@ export const getAllProfessionalApplications = async (
     // Fetch all professional applications
     const professionalApplications = await AppDataSource.getRepository(
       ProfessionalApplication
-    ).find();
+    ).find({
+      relations: ["user"],
+    });
+    console.log(professionalApplications);
+    // const { firstName, lastName, email, phoneNumber, countryOfResidence } =
+    //   professionalApplications.user;
 
-    return res.status(200).json(professionalApplications);
+    // const responsePayload = {
+    //   ...professionalApplications,
+    //   user: {
+    //     firstName,
+    //     lastName,
+    //     email,
+    //     phoneNumber,
+    //     countryOfResidence,
+    //   },
+    // };
+
+    return res.json(professionalApplications);
   } catch (error) {
     console.error("Error fetching professional applications:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.json({ error: "Internal server error" });
   }
 };
 
