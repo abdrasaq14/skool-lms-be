@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const secretKey: string = process.env.JWT_SECRET || 'your_secret_key'
+const secretKey: string = process.env.JWT_SECRET || "your_secret_key";
 
 export const createProfessionalApplication = async (
   req: Request,
@@ -66,7 +66,6 @@ export const createProfessionalApplication = async (
     if (!errors.isEmpty()) {
       return res.json({ errors: errors.array() });
     }
-
 
     // Fetch user from database
     const userRepository = AppDataSource.getRepository(User);
@@ -182,7 +181,7 @@ export const getAllProfessionalApplicationsWithStatus = async (
     const applicationsWithStatus = professionalApplications.map(
       (application) => ({
         ...application,
-        status: "Pending"
+        status: "Pending",
       })
     );
 
@@ -200,7 +199,9 @@ export const getAllProfessionalApplications = async (
 ) => {
   try {
     // Fetch all professional applications
-    const professionalApplications = await AppDataSource.getRepository(ProfessionalApplication).find();
+    const professionalApplications = await AppDataSource.getRepository(
+      ProfessionalApplication
+    ).find();
 
     return res.status(200).json(professionalApplications);
   } catch (error) {
@@ -268,7 +269,6 @@ export const deleteMultipleProfessionalApplications = async (
   }
 };
 
-
 // Admin to approve professional application
 
 export const approveProfessionalApplication = async (
@@ -282,11 +282,10 @@ export const approveProfessionalApplication = async (
       ProfessionalApplication
     );
 
-    const applicationToApprove = await professionalApplicationRepository.findOne(
-      {
+    const applicationToApprove =
+      await professionalApplicationRepository.findOne({
         where: { id },
-      }
-    );
+      });
 
     if (!applicationToApprove) {
       return res
@@ -319,9 +318,11 @@ export const rejectProfessionalApplication = async (
       ProfessionalApplication
     );
 
-    const applicationToReject = await professionalApplicationRepository.findOne({
-      where: { id },
-    });
+    const applicationToReject = await professionalApplicationRepository.findOne(
+      {
+        where: { id },
+      }
+    );
 
     if (!applicationToReject) {
       return res
@@ -339,8 +340,7 @@ export const rejectProfessionalApplication = async (
     console.error("Error rejecting application:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
-}
-
+};
 
 // Function to fetch user professional applications and courses
 export const getUserProfessionalData = async (req: Request, res: Response) => {
@@ -348,10 +348,13 @@ export const getUserProfessionalData = async (req: Request, res: Response) => {
 
   try {
     // Fetch professional applications using ProfessionalApplication entity
-    const professionalApplicationRepository = AppDataSource.getRepository(ProfessionalApplication);
-    const professionalApplications = await professionalApplicationRepository.find({
-      where: { id },
-    });
+    const professionalApplicationRepository = AppDataSource.getRepository(
+      ProfessionalApplication
+    );
+    const professionalApplications =
+      await professionalApplicationRepository.find({
+        where: { id },
+      });
 
     // Fetch courses using Course entity
     const courseRepository = AppDataSource.getRepository(Course);
@@ -366,8 +369,7 @@ export const getUserProfessionalData = async (req: Request, res: Response) => {
 
     res.json(userProfessionalData);
   } catch (error) {
-    console.error('Error fetching user professional data:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching user professional data:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
-
