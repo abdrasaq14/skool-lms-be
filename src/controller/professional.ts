@@ -204,19 +204,21 @@ export const getAllProfessionalApplications = async (
       relations: ["user"],
     });
     console.log(professionalApplications);
-    // const { firstName, lastName, email, phoneNumber, countryOfResidence } =
-    //   professionalApplications.user;
+    const responsePayload = professionalApplications.map((application) => {
+      const { firstName, lastName, email, phoneNumber, countryOfResidence } =
+        application.user;
 
-    // const responsePayload = {
-    //   ...professionalApplications,
-    //   user: {
-    //     firstName,
-    //     lastName,
-    //     email,
-    //     phoneNumber,
-    //     countryOfResidence,
-    //   },
-    // };
+      return {
+        ...application,
+        user: {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          countryOfResidence,
+        },
+      };
+    });
 
     return res.json(professionalApplications);
   } catch (error) {
