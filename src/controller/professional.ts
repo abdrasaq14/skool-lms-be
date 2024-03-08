@@ -193,17 +193,62 @@ export const getAllProfessionalApplicationsWithStatus = async (
 };
 
 // fetching all applications regardless of status
-export const getAllProfessionalApplications = async (
-  req: Request,
-  res: Response
-) => {
+export const getAllProfessionalApplications = async (req: Request, res: Response) => {
   try {
-    // Fetch all professional applications
     const professionalApplications = await AppDataSource.getRepository(
       ProfessionalApplication
-    ).find();
+    )
+      .createQueryBuilder("application")
+      .leftJoinAndSelect("application.user", "user")
+      .getMany();
 
-    return res.status(200).json(professionalApplications);
+    // Map and structure the response payload
+    const responsePayload = await Promise.all(
+      professionalApplications.map(async (application) => {
+        const {
+          id,
+          status,
+          personalStatement,
+          addQualification,
+          employmentDetails,
+          fundingInformation,
+          disability,
+          academicReference,
+          englishLanguageQualification,
+          passportUpload,
+          user,
+        } = application;
+
+        // Fetch course information based on user ID
+        const userCourses = await AppDataSource.getRepository(Course).find({
+          where: { userId: user.id },
+        });
+
+        return {
+          id,
+          status,
+          personalStatement,
+          addQualification,
+          employmentDetails,
+          fundingInformation,
+          disability,
+          academicReference,
+          englishLanguageQualification,
+          passportUpload,
+          user: {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            countryOfResidence: user.countryOfResidence,
+          },
+          course: userCourses,
+        };
+      })
+    );
+
+    return res.json(responsePayload);
   } catch (error) {
     console.error("Error fetching professional applications:", error);
     return res.status(500).json({ error: "Internal server error" });

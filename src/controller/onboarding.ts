@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../database/data-source";
 import { User } from "../entity/user";
 import { Course } from "../entity/course";
-import { Application } from "../entity/application";
+import { Application } from "../entity/onboarding";
 import jwt from "jsonwebtoken";
 
 const secret: string = process.env.JWT_SECRET!;
