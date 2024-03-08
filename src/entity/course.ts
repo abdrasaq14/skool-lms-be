@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import { User } from "./user";
 
 @Entity()
@@ -6,7 +6,7 @@ export class Course {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   userId?: string;
 
   @Column({ nullable: false })
@@ -30,7 +30,7 @@ export class Course {
     courseSearch: string,
     entryYear: string,
     entryMonth: string,
-    userId: string
+    userId: string,
   ) {
     this.courseType = courseType;
     this.studyMode = studyMode;

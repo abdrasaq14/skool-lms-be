@@ -2,6 +2,7 @@ import jwt, { Jwt, JwtPayload } from "jsonwebtoken";
 import { Request, Response } from "express";
 import { validationResult, check } from "express-validator";
 import { User } from "../entity/user";
+
 import { ProfessionalApplication } from "../entity/professional-app";
 import { Course } from "../entity/course";
 import { AppDataSource } from "../database/data-source";
