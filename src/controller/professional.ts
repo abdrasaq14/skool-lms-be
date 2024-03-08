@@ -19,7 +19,7 @@ export const createProfessionalApplication = async (
     // Extract JWT token from Authorization header
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.json({ error: "Unauthorized" });
     }
 
     let decodedToken: (Jwt & JwtPayload) | undefined;
@@ -29,14 +29,12 @@ export const createProfessionalApplication = async (
       console.log("Decoded Token:", decodedToken); // Log decoded token
     } catch (error) {
       console.error("Error decoding token:", error);
-      return res.status(401).json({ error: "Unauthorized: Invalid token" });
+      return res.json({ error: "Unauthorized: Invalid token" });
     }
 
     if (!decodedToken || !decodedToken.id) {
       console.error("Invalid token payload");
-      return res
-        .status(401)
-        .json({ error: "Unauthorized: Invalid token payload" });
+      return res.json({ error: "Unauthorized: Invalid token payload" });
     }
 
     const loggedInUserId = decodedToken.id;
@@ -65,7 +63,7 @@ export const createProfessionalApplication = async (
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.json({ errors: errors.array() });
     }
 
     // Fetch user from database
@@ -74,7 +72,7 @@ export const createProfessionalApplication = async (
       where: { id: loggedInUserId },
     });
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.json({ error: "User not found" });
     }
 
     // Save professional application with passport upload
@@ -113,7 +111,10 @@ export const createProfessionalApplication = async (
     const tokenPayload = { userId }; // Use userId as the key in the payload
     const authToken = jwt.sign(tokenPayload, secretKey, { expiresIn: "1h" }); // Include userId in the payload
 
-    return res.json({ newProfessionalApplication, authToken }); // Include authToken in the response
+    return res.json({
+      message: "Application submitted successfully",
+      authToken,
+    });
   } catch (error) {
     console.error("Error creating professional application:", error);
     return res.json({ error: "Internal server error" });
@@ -133,7 +134,6 @@ export const getProfessionalApplication = async (
     ).findOne({
       where: { id },
       relations: ["user"],
-     
     });
 
     if (!professionalApplication) {
@@ -234,7 +234,9 @@ export const deleteProfessionalApplication = async (
 
     await professionalApplicationRepository.remove(applicationToDelete);
 
-    return res.json({ message: "Professional application deleted sucessfully" });
+    return res.json({
+      message: "Professional application deleted sucessfully",
+    });
   } catch (error) {
     console.error("Error deleting professional application:", error);
     return res.json({ erreo: "Internal server Error" });
@@ -283,8 +285,7 @@ export const approveProfessionalApplication = async (
       });
 
     if (!applicationToApprove) {
-      return res
-        .json({ error: "Professional application not found" });
+      return res.json({ error: "Professional application not found" });
     }
 
     applicationToApprove.status = "accepted";
@@ -317,7 +318,7 @@ export const rejectProfessionalApplication = async (
     );
 
     if (!applicationToReject) {
-      return res .json({ error: "Professional application not found" });
+      return res.json({ error: "Professional application not found" });
     }
 
     applicationToReject.status = "Rejected";

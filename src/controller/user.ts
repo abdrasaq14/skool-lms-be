@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { User } from "../entity/user";
 import { Course } from "../entity/course";
+import { ProfessionalApplication } from "../entity/professional-app";
 import { AppDataSource } from "../database/data-source";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -405,6 +406,48 @@ export const editUserDetails = async (req: Request, res: Response) => {
       await userRepository.save(user);
 
       res.json({ successMessage: "Profile updated successfully" });
+    }
+  }
+};
+
+export const fetchUserDetails = async (req: Request, res: Response) => {
+  const userRepository = AppDataSource.getRepository(User);
+
+  const applicationRepository = AppDataSource.getRepository(
+    ProfessionalApplication
+  );
+
+  const courseRepository = AppDataSource.getRepository(Course);
+
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    res.json({ noTokenError: "Unauthorized - Token not provided" });
+  } else {
+    const decoded = jwt.verify(token, secret) as { id: string };
+
+    const userDetails = await userRepository.findOne({
+      where: { id: decoded.id },
+    });
+
+    const applicationDetails = await AppDataSource.getRepository(
+      ProfessionalApplication
+    ).findOne({
+      where: { id: decoded.id },
+      relations: ["user"],
+    });
+
+    console.log("Application Details:", applicationDetails);
+
+    const courseDetails = await courseRepository.findOne({
+      where: { userId: decoded.id },
+    });
+
+    if (!userDetails) {
+      res.json({ userNotFoundError: "User not found" });
+      return;
+    } else {
+      res.json({ userDetails, applicationDetails, courseDetails });
     }
   }
 };

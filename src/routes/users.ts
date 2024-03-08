@@ -7,6 +7,7 @@ import {
   resetPasswordToken,
   changePassword,
   editUserDetails,
+  fetchUserDetails,
 } from "../controller/user";
 import { createOnboarding } from "../controller/onboarding"; // Update the path accordingly
 import {
@@ -26,6 +27,7 @@ router.post("/forgotpassword", resetPassword);
 router.post("/forgotpassword/:token", resetPasswordToken);
 router.post("/change-password", changePassword);
 router.put("/edit-profile", editUserDetails);
+router.get("/dashboard", fetchUserDetails);
 
 // Route for updating onboarding details
 router.post("/onboarding", createOnboarding);
