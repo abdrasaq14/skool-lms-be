@@ -199,9 +199,29 @@ export const getAllProfessionalApplications = async (
 ) => {
   try {
     // Fetch all professional applications
-    const professionalApplications = await AppDataSource.getRepository(ProfessionalApplication).find();
+    const professionalApplications = await AppDataSource.getRepository(
+      ProfessionalApplication
+    ).find({
+      relations: ["user"],
+    });
+    console.log(professionalApplications);
+    const responsePayload = professionalApplications.map((application) => {
+      const { firstName, lastName, email, phoneNumber, countryOfResidence } =
+        application.user;
 
-    return res.status(200).json(professionalApplications);
+      return {
+        ...application,
+        user: {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          countryOfResidence,
+        },
+      };
+    });
+
+    return res.json(professionalApplications);
   } catch (error) {
     console.error("Error fetching professional applications:", error);
     return res.status(500).json({ error: "Internal server error" });
