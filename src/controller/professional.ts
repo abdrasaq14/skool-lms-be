@@ -27,7 +27,6 @@ export const createProfessionalApplication = async (
     try {
       // Verify and decode JWT token
       decodedToken = jwt.verify(token, secretKey) as Jwt & JwtPayload;
-      console.log("Decoded Token:", decodedToken); // Log decoded token
     } catch (error) {
       console.error("Error decoding token:", error);
       return res.json({ error: "Unauthorized: Invalid token" });
@@ -35,7 +34,9 @@ export const createProfessionalApplication = async (
 
     if (!decodedToken || !decodedToken.id) {
       console.error("Invalid token payload");
-      return res.json({ error: "Unauthorized: Invalid token payload" });
+      return res.json({
+        error: "Unauthorized: Invalid token payload",
+      });
     }
 
     const loggedInUserId = decodedToken.id;
@@ -64,14 +65,16 @@ export const createProfessionalApplication = async (
     // Check for validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.json({ errors: errors.array() });
+      return res.json({ error: errors.array() });
     }
 
     // Fetch user from database
     const userRepository = AppDataSource.getRepository(User);
+
     const user = await userRepository.findOne({
       where: { id: loggedInUserId },
     });
+
     if (!user) {
       return res.json({ error: "User not found" });
     }
@@ -91,6 +94,19 @@ export const createProfessionalApplication = async (
     const professionalApplicationRepository = AppDataSource.getRepository(
       ProfessionalApplication
     );
+
+    const ifApplied = await professionalApplicationRepository.findOne({
+      where: { user: { id: loggedInUserId } },
+    });
+
+    console.log("ifApplied", ifApplied);
+
+    if (ifApplied) {
+      return res.json({
+        error: "You have already applied",
+      });
+    }
+
     const newProfessionalApplication = professionalApplicationRepository.create(
       {
         user,
@@ -105,16 +121,12 @@ export const createProfessionalApplication = async (
       }
     );
 
+    console.log("New Professional Application:", newProfessionalApplication);
+
     await professionalApplicationRepository.save(newProfessionalApplication);
 
-    // Generate JWT token with userId in the payload
-    const userId = user.id; // Assuming you have the user ID available
-    const tokenPayload = { userId }; // Use userId as the key in the payload
-    const authToken = jwt.sign(tokenPayload, secretKey, { expiresIn: "1h" }); // Include userId in the payload
-
     return res.json({
-      message: "Application submitted successfully",
-      authToken,
+      successMessage: "Application submitted successfully",
     });
   } catch (error) {
     console.error("Error creating professional application:", error);
@@ -193,7 +205,10 @@ export const getAllProfessionalApplicationsWithStatus = async (
 };
 
 // fetching all applications regardless of status
-export const getAllProfessionalApplications = async (req: Request, res: Response) => {
+export const getAllProfessionalApplications = async (
+  req: Request,
+  res: Response
+) => {
   try {
     const professionalApplications = await AppDataSource.getRepository(
       ProfessionalApplication
@@ -388,33 +403,3 @@ export const rejectProfessionalApplication = async (
 };
 
 // Function to fetch user professional applications and courses
-export const getUserProfessionalData = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  try {
-    // Fetch professional applications using ProfessionalApplication entity
-    const professionalApplicationRepository = AppDataSource.getRepository(
-      ProfessionalApplication
-    );
-    const professionalApplications =
-      await professionalApplicationRepository.find({
-        where: { id },
-      });
-
-    // Fetch courses using Course entity
-    const courseRepository = AppDataSource.getRepository(Course);
-    const courses = await courseRepository.find({
-      where: { id },
-    });
-
-    const userProfessionalData = {
-      professional_applications: professionalApplications,
-      courses: courses,
-    };
-
-    res.json(userProfessionalData);
-  } catch (error) {
-    console.error("Error fetching user professional data:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
