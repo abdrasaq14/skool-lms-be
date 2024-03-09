@@ -36,7 +36,7 @@ export async function checkAndVerifyToken(
     }
   } catch (error: any) {
     if (error.name === "TokenExpiredError") {
-      res.json({ tokenExpiredError: "Unauthorized - Token has expired" });
+      res.json({ TokenExpiredError: "Unauthorized - Token has expired" });
     } else {
       res.json({
         verificationError: "Unauthorized - Token verification failed",
