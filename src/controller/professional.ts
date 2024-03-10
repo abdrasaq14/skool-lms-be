@@ -353,7 +353,7 @@ export const approveProfessionalApplication = async (
         .json({ error: "Professional application not found" });
     }
 
-    applicationToApprove.status = "Approved";
+    applicationToApprove.status = "Accepted";
     await professionalApplicationRepository.save(applicationToApprove);
 
     return res
