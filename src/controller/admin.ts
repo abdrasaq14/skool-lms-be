@@ -18,7 +18,7 @@ export const singleDownload = async (req: Request, res: Response) => {
   }
 
 
-  export const singleDownload = async (req: Request, res: Response) => {
+  export const singleDownloads = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     if (!id) {
@@ -34,4 +34,3 @@ export const singleDownload = async (req: Request, res: Response) => {
 
     res.send(htmlContent);
   }
-};
