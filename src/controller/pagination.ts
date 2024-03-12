@@ -17,11 +17,27 @@ export const getItems = (req: any, res: any) => {
 
     const paginatedItems = items.slice(startIndex, endIndex);
 
-    res.json({
+    const totalPages = Math.ceil(items.length / perPage);
+
+    let prevPage = page - 1;
+    if (prevPage < 1) {
+        prevPage = 1;
+    }
+
+    let nextPage = page + 1;
+    if (nextPage > totalPages) {
+        nextPage = totalPages;
+    }
+
+    const response = {
         page,
         perPage,
         totalItems: items.length,
-        totalPages: Math.ceil(items.length / perPage),
+        totalPages,
         data: paginatedItems,
-    });
+        prev: page > 1 ? `/items?page=${prevPage}` : null,
+        next: page < totalPages ? `/items?page=${nextPage}` : null,
+    };
+
+    res.json(response);
 };
