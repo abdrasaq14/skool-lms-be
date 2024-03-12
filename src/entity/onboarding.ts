@@ -8,7 +8,7 @@ import {
 import { User } from "./user";
 
 @Entity()
-export class Application {
+export class Onboarding {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 

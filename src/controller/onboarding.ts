@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../database/data-source";
 import { User } from "../entity/user";
 import { Course } from "../entity/course";
-import { Application } from "../entity/application";
+import { Onboarding } from "../entity/onboarding";
 import jwt from "jsonwebtoken";
 
 const secret: string = process.env.JWT_SECRET!;
@@ -20,19 +20,13 @@ export const createOnboarding = async (req: Request, res: Response) => {
     const userId = decoded.id;
 
     // Extract onboarding data from the request body
-    const { course } = req.body;
+    const { course, applicationType } = req.body;
     console.log(course);
 
-    const {
-      courseType,
-      studyMode,
-      courseSearch,
-      entryYear,
-      entryMonth,
-      gender,
-      birthCountry,
-      nationality,
-    } = course;
+    const { courseType, studyMode, courseSearch, entryYear, entryMonth } =
+      course;
+
+    const { gender, birthCountry, nationality } = applicationType;
 
     // Check if courseType is present and not null
     if (!courseType) {
@@ -57,7 +51,7 @@ export const createOnboarding = async (req: Request, res: Response) => {
       userId
     );
 
-    const applicationEntity = new Application(
+    const applicationEntity = new Onboarding(
       gender,
       birthCountry,
       nationality,
@@ -65,7 +59,7 @@ export const createOnboarding = async (req: Request, res: Response) => {
     );
 
     const courseRepository = AppDataSource.getRepository(Course);
-    const applicationRepository = AppDataSource.getRepository(Application);
+    const applicationRepository = AppDataSource.getRepository(Onboarding);
 
     await courseRepository.save(courseEntity);
     await applicationRepository.save(applicationEntity);

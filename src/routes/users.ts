@@ -7,6 +7,8 @@ import {
   resetPasswordToken,
   changePassword,
   editUserDetails,
+  fetchUserDashboard,
+  hasUserApplied,
 } from "../controller/user";
 import { createOnboarding } from "../controller/onboarding"; // Update the path accordingly
 import {
@@ -16,9 +18,7 @@ import {
   deleteMultipleProfessionalApplications,
   approveProfessionalApplication,
   rejectProfessionalApplication,
-  getUserProfessionalData
 } from "../controller/professional";
-
 
 const router = Router();
 
@@ -26,20 +26,27 @@ router.post("/register", createUser);
 router.post("/login", loginUser);
 router.post("/forgotpassword", resetPassword);
 router.post("/forgotpassword/:token", resetPasswordToken);
+
+//User dahboard routes
 router.post("/change-password", changePassword);
 router.put("/edit-profile", editUserDetails);
+router.get("/dashboard", fetchUserDashboard);
+
+router.get("/professional-application", hasUserApplied);
+
+
+
 
 // Route for updating onboarding details
 router.post("/onboarding", createOnboarding);
+
+
 
 // Route for creating a new professional application
 router.post("/professional-application", createProfessionalApplication);
 
 // Route to get a single Professional application
 router.get("/professional-applications/:id", getProfessionalApplication);
-
-// Route to get user professional details/data
-router.get('/user-dashboard/:id', getUserProfessionalData);
 
 // Route to verify OTP for email authentication
 router.post("/verify-otp", verifyOTPEmailAuth);
