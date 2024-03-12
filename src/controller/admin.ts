@@ -18,4 +18,3 @@ import { Request, Response } from 'express';
 
     res.send(htmlContent);
   }
-

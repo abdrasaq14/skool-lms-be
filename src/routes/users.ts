@@ -1,4 +1,4 @@
-import { Router } from "express"; // Import Router from express
+import { Router } from "express";
 import {
   createUser,
   loginUser,
@@ -10,7 +10,7 @@ import {
   fetchUserDashboard,
   hasUserApplied,
 } from "../controller/user";
-import { createOnboarding } from "../controller/onboarding"; // Update the path accordingly
+import { createOnboarding } from "../controller/onboarding"; 
 import {
   createProfessionalApplication,
   getProfessionalApplication,
