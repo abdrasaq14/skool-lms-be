@@ -14,6 +14,8 @@ import { AppDataSource } from "./database/data-source";
 import cors from "cors";
 
 import indexRouter from "./routes/index";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
 import protectedRouter from "./routes/protectedRoutes";
@@ -30,6 +32,23 @@ AppDataSource.initialize()
 
 const app = express();
 const frontEndUrl = process.env.FRONTEND_URL;
+
+// socket.io
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: frontEndUrl,
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
 
 app.use(
   session({
