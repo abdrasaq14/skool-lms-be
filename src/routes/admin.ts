@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     getAllProfessionalApplicationsWithStatus, getAllProfessionalApplications, getProfessionalApplication
 } from "../controller/professional";
+import { getItems } from "../controller/pagination";
 
 const router = Router();
 
@@ -16,6 +17,6 @@ router.get("/professional-applications", getAllProfessionalApplications);
 // Route to get a single Professional application
 router.get("/professional-applications/:id", getProfessionalApplication);
 
-
+router.get('/', getItems);
 
 export default router;

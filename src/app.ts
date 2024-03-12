@@ -20,6 +20,7 @@ import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
 import protectedRouter from "./routes/protectedRoutes";
 import { request } from "http";
+import itemRoutes from "./routes/admin";
 
 dotenv.config();
 
@@ -75,6 +76,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/admin", adminRouter);
 app.use("/admin", adminRouter);
+app.use('/items', itemRoutes);
 
 app.use("/protected-route", protectedRouter);
 
