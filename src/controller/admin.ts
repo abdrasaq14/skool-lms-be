@@ -14,3 +14,4 @@ export const singleDownload = async (req: Request, res: Response) => {
     res.setHeader('Content-Disposition', 'attachment; filename=download.pdf');
     res.send(pdfBuffer);
   }
+
