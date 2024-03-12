@@ -7,6 +7,6 @@ router.post('/', function(req, res,) {
   res.send('I am connected to the PostgresSql database succefully');
 });
 
-router.get('/download-pdf', singleDownload);
+router.get('/download-pdf/:id', singleDownload);
 
 export default router;
