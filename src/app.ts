@@ -34,17 +34,25 @@ AppDataSource.initialize()
 const app = express();
 const frontEndUrl = process.env.FRONTEND_URL;
 
-// socket.io
+// socket.io connection
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: frontEndUrl,
-    methods: ["GET", "POST"],
+    origin: process.env.SOCKET_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
 
+
 io.on("connection", (socket) => {
   console.log("a user connected");
+
+  socket.on("testEvent", (data) => {
+    console.log("Received test event from client:", data);
+    
+    socket.emit("testEventResponse", "Hello from server!");
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
