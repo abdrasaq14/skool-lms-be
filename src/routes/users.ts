@@ -10,7 +10,7 @@ import {
   fetchUserDashboard,
   hasUserApplied,
 } from "../controller/user";
-import { createOnboarding } from "../controller/onboarding"; 
+import { createOnboarding } from "../controller/onboarding";
 import {
   createProfessionalApplication,
   getProfessionalApplication,
@@ -32,16 +32,12 @@ router.post("/forgotpassword/:token", resetPasswordToken);
 router.post("/change-password", changePassword);
 router.put("/edit-profile", editUserDetails);
 router.get("/dashboard", fetchUserDashboard);
+router.get("/notifications", getNotification);
 
 router.get("/professional-application", hasUserApplied);
 
-
-
-
 // Route for updating onboarding details
 router.post("/onboarding", createOnboarding);
-
-
 
 // Route for creating a new professional application
 router.post("/professional-application", createProfessionalApplication);
@@ -73,6 +69,5 @@ router.put("/reject-application/:id", rejectProfessionalApplication);
 router.post("/notification", createNotification);
 // Route to get a notification
 router.get("/notification", getNotification);
-
 
 export default router;

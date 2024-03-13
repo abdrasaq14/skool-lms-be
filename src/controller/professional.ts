@@ -99,7 +99,7 @@ export const createProfessionalApplication = async (
       where: { user: { id: loggedInUserId } },
     });
 
-    console.log("ifApplied", ifApplied);
+    // console.log("ifApplied", ifApplied);
 
     if (ifApplied) {
       return res.json({

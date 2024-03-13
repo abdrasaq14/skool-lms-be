@@ -436,8 +436,6 @@ export const fetchUserDashboard = async (req: Request, res: Response) => {
       where: { user: { id: decoded.id } },
     });
 
-    console.log("Application Details:", applicationDetails);
-
     const courseDetails = await courseRepository.findOne({
       where: { userId: decoded.id },
     });

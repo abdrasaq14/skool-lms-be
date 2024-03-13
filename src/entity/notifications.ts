@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
   OneToOne,
+  ManyToOne,
 } from "typeorm";
 import { User } from "./user";
 
@@ -14,7 +15,7 @@ export class Notification {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @OneToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id)
   @JoinColumn({ name: "userId" })
   user!: User;
 
