@@ -19,6 +19,7 @@ import {
   approveProfessionalApplication,
   rejectProfessionalApplication,
 } from "../controller/professional";
+import { createNotification, getNotification } from "../controller/nofications";
 
 const router = Router();
 
@@ -68,6 +69,10 @@ router.put("/approve-application/:id", approveProfessionalApplication);
 // Route to reject a professional application
 router.put("/reject-application/:id", rejectProfessionalApplication);
 
-/* GET users listing. */
+// Route to create a notification
+router.post("/notification", createNotification);
+// Route to get a notification
+router.get("/notification", getNotification);
+
 
 export default router;
