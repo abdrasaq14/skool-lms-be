@@ -34,7 +34,6 @@ export const getNotification = async (req: Request, res: Response) => {
     const decoded = jwt.verify(token, secret) as { id: string };
     const userId = decoded.id;
 
-
     const notifications = await AppDataSource.getRepository(Notification).find({
       where: { user: { id: decoded.id } },
     });
