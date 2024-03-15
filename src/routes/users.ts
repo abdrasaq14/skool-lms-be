@@ -19,7 +19,11 @@ import {
   approveProfessionalApplication,
   rejectProfessionalApplication,
 } from "../controller/professional";
-import { getNotification, updateNotification } from "../controller/nofications";
+import {
+  getNotification,
+  updateNotification,
+  deleteNotification,
+} from "../controller/nofications";
 
 const router = Router();
 
@@ -70,5 +74,8 @@ router.get("/notification", getNotification);
 
 // Route to update notification as read or unread
 router.put("/notification/:id", updateNotification);
+
+// Route to delete notification
+router.delete("/notification/:id", deleteNotification);
 
 export default router;
