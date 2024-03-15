@@ -3,6 +3,7 @@ import {
     getAllProfessionalApplicationsWithStatus, getAllProfessionalApplications, getProfessionalApplication
 } from "../controller/professional";
 import { getItems } from "../controller/pagination";
+import { createNotification } from "../controller/nofications";
 
 const router = Router();
 
@@ -18,5 +19,8 @@ router.get("/professional-applications", getAllProfessionalApplications);
 router.get("/professional-applications/:id", getProfessionalApplication);
 
 router.get('/', getItems);
+
+// Route to create a notification
+router.post("/notification/:id", createNotification);
 
 export default router;
