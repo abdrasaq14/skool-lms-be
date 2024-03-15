@@ -33,4 +33,5 @@ export class Notification {
 
   @UpdateDateColumn({ type: "timestamptz", default: () => "CURRENT_TIMESTAMP" })
   updatedAt!: Date;
+  userId: any;
 }

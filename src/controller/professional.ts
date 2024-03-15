@@ -156,13 +156,14 @@ export const getProfessionalApplication = async (
     }
 
     // Destructure user details from the associated user
-    const { firstName, lastName, email, phoneNumber, countryOfResidence } =
+    const { id: userId, firstName, lastName, email, phoneNumber, countryOfResidence,  } =
       professionalApplication.user;
 
     // Include user details in the response
     const responsePayload = {
       ...professionalApplication,
       user: {
+        id: userId,
         firstName,
         lastName,
         email,
