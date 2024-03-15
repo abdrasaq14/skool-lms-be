@@ -6,24 +6,6 @@ import { User } from "../entity/user";
 
 const secret: string = process.env.JWT_SECRET!;
 
-// export const createNotification = async (req: Request, res: Response) => {
-//   const { title, message, status} = req.body;
-//   const { id } = req.params;
-//   try {
-//     const notification = new Notification();
-//     notification.title = title;
-//     notification.message = message;
-//     // notification.status = status;
-//     notification.user.id = id;
-//     await AppDataSource.getRepository(Notification).save(notification);
-
-//     res.json(notification);
-//   } catch (error) {
-//     console.error("Error creating notification:", error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
-
 export const createNotification = async (req: Request, res: Response) => {
   const { title, message } = req.body;
   const { id } = req.params as any;
@@ -60,7 +42,6 @@ export const getNotification = async (req: Request, res: Response) => {
 
     const decoded = jwt.verify(token, secret) as { id: string };
     const userId = decoded.id;
-
 
     const notifications = await AppDataSource.getRepository(Notification).find({
       where: { user: { id: decoded.id } },
