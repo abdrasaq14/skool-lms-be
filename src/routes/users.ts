@@ -66,7 +66,7 @@ router.put("/approve-application/:id", approveProfessionalApplication);
 router.put("/reject-application/:id", rejectProfessionalApplication);
 
 // Route to create a notification
-router.post("/notification", createNotification);
+router.post("/notification/:id", createNotification);
 // Route to get a notification
 router.get("/notification", getNotification);
 

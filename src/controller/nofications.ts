@@ -2,19 +2,45 @@ import { Notification } from "../entity/notifications";
 import { Request, Response } from "express";
 import { AppDataSource } from "../database/data-source";
 import jwt from "jsonwebtoken";
+import { User } from "../entity/user";
 
 const secret: string = process.env.JWT_SECRET!;
 
+// export const createNotification = async (req: Request, res: Response) => {
+//   const { title, message, status} = req.body;
+//   const { id } = req.params;
+//   try {
+//     const notification = new Notification();
+//     notification.title = title;
+//     notification.message = message;
+//     // notification.status = status;
+//     notification.user.id = id;
+//     await AppDataSource.getRepository(Notification).save(notification);
+
+//     res.json(notification);
+//   } catch (error) {
+//     console.error("Error creating notification:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
 export const createNotification = async (req: Request, res: Response) => {
-  const { title, message, status } = req.body;
+  const { title, message } = req.body;
+  const { id } = req.params as any;
+  console.log(id);
+  
   try {
+    const user = await AppDataSource.getRepository(User).findOne({ where: { id } });
+    if(!user){
+      return res.json({ error: "User not found" });
+    }
     const notification = new Notification();
     notification.title = title;
     notification.message = message;
-    notification.status = status;
+    notification.user = id; // Assign the user object directly
 
     await AppDataSource.getRepository(Notification).save(notification);
-
+    console.log(notification);
     res.json(notification);
   } catch (error) {
     console.error("Error creating notification:", error);
@@ -26,6 +52,7 @@ export const createNotification = async (req: Request, res: Response) => {
 export const getNotification = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
+  
 
     if (!token) {
       return res.json({ noTokenError: "Unauthorized - Token not available" });
@@ -48,3 +75,7 @@ export const getNotification = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+function getRepository(User: any) {
+  throw new Error("Function not implemented.");
+}
+
