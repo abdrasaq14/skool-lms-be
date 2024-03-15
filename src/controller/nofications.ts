@@ -85,3 +85,24 @@ export const updateNotification = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const deleteNotification = async (req: Request, res: Response) => {
+  const { id } = req.params as any;
+  try {
+    const notification = await AppDataSource.getRepository(
+      Notification
+    ).findOne({
+      where: { id },
+    });
+
+    if (!notification) {
+      return res.json({ error: "Notification not found" });
+    }
+
+    await AppDataSource.getRepository(Notification).remove(notification);
+
+    res.json({ successMessage: "Notification deleted successfully" });
+  } catch {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
