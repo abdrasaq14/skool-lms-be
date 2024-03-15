@@ -10,10 +10,12 @@ export const createNotification = async (req: Request, res: Response) => {
   const { title, message } = req.body;
   const { id } = req.params as any;
   console.log(id);
-  
+
   try {
-    const user = await AppDataSource.getRepository(User).findOne({ where: { id } });
-    if(!user){
+    const user = await AppDataSource.getRepository(User).findOne({
+      where: { id },
+    });
+    if (!user) {
       return res.json({ error: "User not found" });
     }
     const notification = new Notification();
@@ -34,7 +36,6 @@ export const createNotification = async (req: Request, res: Response) => {
 export const getNotification = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
-  
 
     if (!token) {
       return res.json({ noTokenError: "Unauthorized - Token not available" });
@@ -56,7 +57,31 @@ export const getNotification = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 function getRepository(User: any) {
   throw new Error("Function not implemented.");
 }
 
+export const updateNotification = async (req: Request, res: Response) => {
+  const { id } = req.params as any;
+  const { status } = req.body;
+  try {
+    const notification = await AppDataSource.getRepository(
+      Notification
+    ).findOne({
+      where: { id },
+    });
+
+    if (!notification) {
+      return res.json({ error: "Notification not found" });
+    }
+
+    notification.status = status;
+
+    await AppDataSource.getRepository(Notification).save(notification);
+
+    res.json({ sucessMessage: "Notification updated successfully" });
+  } catch {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
