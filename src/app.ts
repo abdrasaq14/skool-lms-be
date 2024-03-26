@@ -12,6 +12,7 @@ import logger from "morgan";
 import "reflect-metadata";
 import { AppDataSource } from "./database/data-source";
 import cors from "cors";
+import bodyParser from "body-parser";
 
 import indexRouter from "./routes/index";
 import { createServer } from "http";
@@ -43,13 +44,12 @@ const io = new Server(httpServer, {
   },
 });
 
-
 io.on("connection", (socket) => {
   console.log("a user connected");
 
   socket.on("testEvent", (data) => {
     console.log("Received test event from client:", data);
-    
+
     socket.emit("testEventResponse", "Hello from server!");
   });
 
@@ -57,7 +57,6 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 });
-
 
 app.use(
   session({
@@ -73,7 +72,8 @@ app.use(
     credentials: true,
   })
 );
-
+app.use(bodyParser.json({ limit: "5mb" }));
+app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -84,7 +84,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/admin", adminRouter);
 app.use("/admin", adminRouter);
-app.use('/items', itemRoutes);
+app.use("/items", itemRoutes);
 
 app.use("/protected-route", protectedRouter);
 
