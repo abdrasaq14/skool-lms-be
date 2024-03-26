@@ -307,47 +307,33 @@ export const deleteProfessionalApplication = async (
   }
 };
 
-// delete multiple applications
 
-// export const deleteMultipleProfessionalApplications = async (
-//   req: Request,
-//   res: Response
-// ) => {
-//   try {
-//     const { ids } = req.body;
-
-//     await AppDataSource.createQueryBuilder()
-//       .delete()
-//       .from(ProfessionalApplication)
-//       .where("id IN (:...ids)", { ids });
-
-//     return res.status(200).json({
-//       message: "Selected professional applications deleted successfully",
-//     });
-//   } catch (error) {
-//     console.error("Error deleting multiple professional applications:", error);
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
 
 export const deleteMultipleProfessionalApplications = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { ids } = req.body;
+    const { applicationIds } = req.body; 
+    console.log(applicationIds);
 
-    const professionalApplicationRepository = AppDataSource.getRepository(ProfessionalApplication);
-    await professionalApplicationRepository.delete(ids);
+    const professionalApplicationRepository = AppDataSource.getRepository(
+      ProfessionalApplication
+    );
+    await professionalApplicationRepository.delete(applicationIds);
 
     return res.json({
       message: "Selected professional applications deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting multiple professional applications:", error);
+    console.error(
+      "Error deleting multiple professional applications:",
+      error
+    );
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 
 // Admin to approve professional application
