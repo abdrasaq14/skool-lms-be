@@ -485,3 +485,29 @@ export const hasUserApplied = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+//Check course availability
+export const checkCourseAvailability = async (req: Request, res: Response) => {
+  const availableCourses = [
+    "Accounting",
+    "Biology",
+    "Computer Science",
+    "Economics",
+  ];
+
+  const { courseName } = req.body;
+
+  const course = await availableCourses.filter(
+    (course) => course.toLowerCase() === courseName.toLowerCase()
+  );
+
+  try {
+    if (course.length === 0) {
+      return res.json({ isAvailable: false, message: "Course not available" });
+    }
+
+    res.json({ isAvailable: true, message: "Course is available" });
+  } catch (error) {
+    res.json({ error: "Internal server error" });
+  }
+};
