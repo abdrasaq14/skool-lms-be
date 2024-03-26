@@ -6,6 +6,7 @@ import { User } from "../entity/user";
 import { ProfessionalApplication } from "../entity/professional-app";
 import { Course } from "../entity/course";
 import { AppDataSource } from "../database/data-source";
+import cloudinary from "../utilities/cloudinary";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -91,6 +92,18 @@ export const createProfessionalApplication = async (
       englishLanguageQualification,
     } = req.body;
 
+    // Upload passport to cloudinary
+    const passportUploadResponse = await cloudinary.v2.uploader.upload(
+      passportUpload,
+      {
+        image: "passport",
+      }
+    );
+
+    console.log("passportUpload", passportUploadResponse);
+
+    const imageUrl = passportUploadResponse.secure_url;
+
     const professionalApplicationRepository = AppDataSource.getRepository(
       ProfessionalApplication
     );
@@ -116,7 +129,7 @@ export const createProfessionalApplication = async (
         employmentDetails,
         fundingInformation,
         disability,
-        passportUpload,
+        passportUpload: imageUrl,
         englishLanguageQualification,
       }
     );
