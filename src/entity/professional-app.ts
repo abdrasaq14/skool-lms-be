@@ -45,8 +45,8 @@ export class ProfessionalApplication {
   @Column({ type: "text" })
   disability!: string;
 
-  @Column({ type: "bytea" })
-  passportUpload!: Buffer;
+  @Column({ type: "text" })
+  passportUpload!: string;
 
   @Column({ type: "boolean" })
   englishLanguageQualification!: boolean;
