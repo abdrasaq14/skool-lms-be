@@ -6,7 +6,6 @@ import express, {
 import session from "express-session";
 import createError from "http-errors";
 import dotenv from "dotenv";
-import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import "reflect-metadata";
@@ -21,7 +20,6 @@ import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
 import chatRouter from "./routes/chats";
 import protectedRouter from "./routes/protectedRoutes";
-import { request } from "http";
 import itemRoutes from "./routes/admin";
 
 dotenv.config();
