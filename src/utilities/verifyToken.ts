@@ -29,6 +29,7 @@ export async function checkAndVerifyToken(
           email: userInfo.email,
           phone: userInfo.phoneNumber,
           country: userInfo.countryOfResidence,
+          userId: userInfo.id,
         };
 
         res.json({ user });
