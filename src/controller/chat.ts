@@ -4,6 +4,7 @@ import { User } from "../entity/user";
 import { AppDataSource } from "../database/data-source";
 
 // Get all chats for a specific user (either user or admin)
+
 export const getChats = async (req: Request, res: Response) => {
   try {
     const { receiverId, senderId } = req.params;
@@ -41,7 +42,7 @@ export const getChats = async (req: Request, res: Response) => {
     }));
 
     // Send the conversation to the client
-    res.status(200).json({ conversation });
+    res.json({ conversation });
   } catch (error) {
     console.error("Error fetching chats:", error);
     res.status(500).json({ message: "Error fetching chats" });
@@ -51,17 +52,18 @@ export const getChats = async (req: Request, res: Response) => {
 // Create a new chat message
 export const createChatMessage = async (req: Request, res: Response) => {
   try {
-    const { message } = req.body;
-    const { senderId, receiverId } = req.params;
+    const message = req.body;
 
     // Get repositories for User and Chat entities from AppDataSource
     const userRepository = AppDataSource.getRepository(User);
     const chatRepository = AppDataSource.getRepository(Chat);
 
     // Find sender and receiver users in the database
-    const sender = await userRepository.findOne({ where: { id: senderId } });
+    const sender = await userRepository.findOne({
+      where: { id: message.senderId },
+    });
     const receiver = await userRepository.findOne({
-      where: { id: receiverId },
+      where: { id: message.receiverId },
     });
 
     if (!sender || !receiver) {
@@ -72,7 +74,8 @@ export const createChatMessage = async (req: Request, res: Response) => {
     const newChatMessage = new Chat();
     newChatMessage.sender = sender;
     newChatMessage.receiver = receiver;
-    newChatMessage.message = message;
+    newChatMessage.message = message.text;
+
     await chatRepository.save(newChatMessage);
 
     res.status(201).json({ message: "Chat message created successfully" });
