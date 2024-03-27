@@ -19,6 +19,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
+import chatRouter from "./routes/chats";
 import protectedRouter from "./routes/protectedRoutes";
 import { request } from "http";
 import itemRoutes from "./routes/admin";
@@ -89,6 +90,7 @@ app.use("/users", usersRouter);
 app.use("/admin", adminRouter);
 app.use("/admin", adminRouter);
 app.use("/items", itemRoutes);
+app.use("/chats", chatRouter);
 
 app.use("/protected-route", protectedRouter);
 
