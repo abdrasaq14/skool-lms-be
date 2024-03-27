@@ -44,20 +44,23 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
+interface OnlineUser {
+  userId: string;
+  socketId: string;
+}
+let onlineUsers: OnlineUser[] = [];
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  console.log("a user connected", socket.id);
 
-  socket.on("testEvent", (data) => {
-    console.log("Received test event from client:", data);
-
-    socket.emit("testEventResponse", "Hello from server!");
-  });
-
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  socket.on("addNewUser", (userId) => {
+    !onlineUsers.some((user) => user.userId === userId) &&
+      onlineUsers.push({ userId, socketId: socket.id as string });
+    console.log(onlineUsers);
   });
 });
+
+httpServer.listen(5000);
 
 app.use(
   session({
