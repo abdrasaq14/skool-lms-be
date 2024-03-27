@@ -48,7 +48,6 @@ interface OnlineUser {
   userId: string;
   socketId: string;
 }
-
 let onlineUsers: OnlineUser[] = [];
 
 io.on("connection", (socket) => {
