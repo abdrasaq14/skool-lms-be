@@ -12,12 +12,14 @@ import logger from "morgan";
 import "reflect-metadata";
 import { AppDataSource } from "./database/data-source";
 import cors from "cors";
+import bodyParser from "body-parser";
 
 import indexRouter from "./routes/index";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import usersRouter from "./routes/users";
 import adminRouter from "./routes/admin";
+import chatRouter from "./routes/chats";
 import protectedRouter from "./routes/protectedRoutes";
 import { request } from "http";
 import itemRoutes from "./routes/admin";
@@ -42,22 +44,23 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
-
+interface OnlineUser {
+  userId: string;
+  socketId: string;
+}
+let onlineUsers: OnlineUser[] = [];
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  console.log("a user connected", socket.id);
 
-  socket.on("testEvent", (data) => {
-    console.log("Received test event from client:", data);
-    
-    socket.emit("testEventResponse", "Hello from server!");
-  });
-
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  socket.on("addNewUser", (userId) => {
+    !onlineUsers.some((user) => user.userId === userId) &&
+      onlineUsers.push({ userId, socketId: socket.id as string });
+    console.log(onlineUsers);
   });
 });
 
+httpServer.listen(5000);
 
 app.use(
   session({
@@ -73,7 +76,8 @@ app.use(
     credentials: true,
   })
 );
-
+app.use(bodyParser.json({ limit: "5mb" }));
+app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -84,7 +88,8 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/admin", adminRouter);
 app.use("/admin", adminRouter);
-app.use('/items', itemRoutes);
+app.use("/items", itemRoutes);
+app.use("/chats", chatRouter);
 
 app.use("/protected-route", protectedRouter);
 
