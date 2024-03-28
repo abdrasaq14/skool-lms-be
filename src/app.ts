@@ -58,6 +58,25 @@ io.on("connection", (socket) => {
       onlineUsers.push({ userId, socketId: socket.id as string });
     console.log(onlineUsers);
   });
+
+  socket.on("sendMessage", (message) => {
+    // Find the recipient's socket id
+
+    console.log("message", message);
+    const recipientSocket = onlineUsers.find(
+      (user) => user.userId === message.receiverId
+    );
+    if (recipientSocket) {
+      // Emit the message to the recipient's socket
+      io.to(recipientSocket.socketId).emit("message", message);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    // Remove user from online users on disconnect
+    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+    console.log("a user disconnected", socket.id);
+  });
 });
 
 httpServer.listen(5000);
