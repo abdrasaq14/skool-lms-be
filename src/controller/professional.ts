@@ -320,28 +320,34 @@ export const deleteProfessionalApplication = async (
   }
 };
 
-// delete multiple applications
+
 
 export const deleteMultipleProfessionalApplications = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { ids } = req.body;
+    const { applicationIds } = req.body; 
+    console.log(applicationIds);
 
-    await AppDataSource.createQueryBuilder()
-      .delete()
-      .from(ProfessionalApplication)
-      .where("id IN (:...ids)", { ids });
+    const professionalApplicationRepository = AppDataSource.getRepository(
+      ProfessionalApplication
+    );
+    await professionalApplicationRepository.delete(applicationIds);
 
-    return res.status(200).json({
+    return res.json({
       message: "Selected professional applications deleted successfully",
     });
   } catch (error) {
-    console.error("Error deleting multiple professional applications:", error);
+    console.error(
+      "Error deleting multiple professional applications:",
+      error
+    );
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
 
 // Admin to approve professional application
 
