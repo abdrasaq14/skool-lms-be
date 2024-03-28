@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Chat } from "../entity/chat";
 import { User } from "../entity/user";
 import { AppDataSource } from "../database/data-source";
+import { ProfessionalApplication } from "../entity/professional-app";
 
 // Get all chats for a specific user (either user or admin)
 
@@ -86,60 +87,126 @@ export const createChatMessage = async (req: Request, res: Response) => {
 };
 
 // Get all users that the current user is chatting with
+// export const getChattingUsers = async (req: Request, res: Response) => {
+//   try {
+//     const { userId } = req.params;
+
+//     const userRepository = AppDataSource.getRepository(User);
+//     const chatRepository = AppDataSource.getRepository(Chat);
+
+//     // First, determine if the requesting user is an admin
+//     const requester = await userRepository.findOneBy({ id: userId });
+
+//     if (!requester) {
+//       return res.status(404).json({ message: "Requesting user not found" });
+//     }
+
+//     let users;
+//     if (requester.isAdmin) {
+//       // If the requester is an admin, fetch all users they have chatted with
+//       const chattingUsers = await chatRepository
+//         .createQueryBuilder("chat")
+//         .select("chat.senderId", "senderId")
+//         .addSelect("chat.receiverId", "receiverId")
+//         .where("chat.senderId = :userId", { userId })
+//         .orWhere("chat.receiverId = :userId", { userId })
+//         .distinct(true)
+//         .getRawMany();
+
+//       const userIds = [
+//         ...new Set(
+//           chattingUsers
+//             .flatMap((user) => [user.senderId, user.receiverId])
+//             .filter((id) => id !== userId)
+//         ),
+//       ];
+//       users = await userRepository.findByIds(userIds);
+//     } else {
+//       // If the requester is a user, only return the admin user(s)
+//       users = await userRepository.findBy({ isAdmin: true });
+//     }
+
+//     // Map the users to return the necessary user details
+//     const mappedUsers = users.map((user) => ({
+//       id: user.id,
+//       firstName: user.firstName,
+//       lastName: user.lastName,
+//       email: user.email,
+//       phoneNumber: user.phoneNumber,
+//       countryOfResidence: user.countryOfResidence,
+//       createdAt: user.createdAt,
+//     }));
+
+//     res.status(200).json({ users: mappedUsers });
+//   } catch (error) {
+//     console.error("Error fetching chatting users:", error);
+//     res.status(500).json({ message: "Error fetching chatting users" });
+//   }
+// };
+
 export const getChattingUsers = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-
     const userRepository = AppDataSource.getRepository(User);
     const chatRepository = AppDataSource.getRepository(Chat);
+    const professionalApplicationRepository = AppDataSource.getRepository(ProfessionalApplication);
+    // src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
-    // First, determine if the requesting user is an admin
     const requester = await userRepository.findOneBy({ id: userId });
-
     if (!requester) {
       return res.status(404).json({ message: "Requesting user not found" });
     }
-
+ 
     let users;
     if (requester.isAdmin) {
-      // If the requester is an admin, fetch all users they have chatted with
       const chattingUsers = await chatRepository
         .createQueryBuilder("chat")
-        .select("chat.senderId", "senderId")
-        .addSelect("chat.receiverId", "receiverId")
-        .where("chat.senderId = :userId", { userId })
-        .orWhere("chat.receiverId = :userId", { userId })
-        .distinct(true)
-        .getRawMany();
-
-      const userIds = [
-        ...new Set(
-          chattingUsers
-            .flatMap((user) => [user.senderId, user.receiverId])
-            .filter((id) => id !== userId)
-        ),
-      ];
-      users = await userRepository.findByIds(userIds);
+        .leftJoinAndSelect("chat.sender", "sender")
+        .leftJoinAndSelect("chat.receiver", "receiver")
+        .where("chat.sender.id = :userId OR chat.receiver.id = :userId", { userId })
+        .getMany();
+ 
+      const userIds = new Set(chattingUsers.map(chat => chat.sender.id === userId ? chat.receiver.id : chat.sender.id));
+      users = await userRepository.findByIds(Array.from(userIds));
     } else {
-      // If the requester is a user, only return the admin user(s)
       users = await userRepository.findBy({ isAdmin: true });
     }
-
-    // Map the users to return the necessary user details
-    const mappedUsers = users.map((user) => ({
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      countryOfResidence: user.countryOfResidence,
-      createdAt: user.createdAt,
+ 
+    const defaultUserImageUrl = "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+    const defaultAdminImageUrl = "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+ 
+    const mappedUsers = await Promise.all(users.map(async user => {
+      const application = await professionalApplicationRepository.findOne({
+        where: { user: { id: user.id } },
+      });
+ 
+      // Ensure sender is loaded with the last message
+      const lastMessage = await chatRepository.createQueryBuilder("chat")
+        .leftJoinAndSelect("chat.sender", "sender")
+        .where("(chat.sender.id = :userId AND chat.receiver.id = :otherUserId) OR (chat.sender.id = :otherUserId AND chat.receiver.id = :userId)", { userId, otherUserId: user.id })
+        .orderBy("chat.createdAt", "DESC")
+        .getOne();
+ 
+      return {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        countryOfResidence: user.countryOfResidence,
+        createdAt: user.createdAt,
+        passportUpload: user.isAdmin ? defaultAdminImageUrl : (application?.passportUpload || defaultUserImageUrl),
+        lastMessage: lastMessage ? lastMessage.message : null,
+        lastMessageCreatedAt: lastMessage ? lastMessage.createdAt.toISOString() : null,
+        // Correctly handle potential undefined sender
+        lastMessageSentByCurrentUser: lastMessage ? (lastMessage.sender ? lastMessage.sender.id === userId : false) : null,
+      };
     }));
-
+ 
     res.status(200).json({ users: mappedUsers });
   } catch (error) {
-    console.error("Error fetching chatting users:", error);
-    res.status(500).json({ message: "Error fetching chatting users" });
+    console.error("Error fetching chatting users with last message:", error);
+    res.status(500).json({ message: "Error fetching chatting users with last message" });
   }
 };
 
@@ -170,7 +237,3 @@ export const deleteChatMessage = async (req: Request, res: Response) => {
   }
 };
 
-export const getAdmin = () => {
-  const userRepository = AppDataSource.getRepository(User);
-  return userRepository.findOne({ where: { isAdmin: true } });
-}
