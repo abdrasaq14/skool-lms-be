@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (message) => {
     // Find the recipient's socket id
 
-    console.log("message", message);
+    console.log("socket-message", message);
     const recipientSocket = onlineUsers.find(
       (user) => user.userId === message.receiverId
     );
