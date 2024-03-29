@@ -162,12 +162,10 @@ export const loginUser = async (req: AuthRequest, res: Response) => {
 };
 
 export const forgotPasswordUser = async (req: AuthRequest, res: Response) => {
-  // console.log('Request received:', req.method, req.url, req.body);
   try {
     const userRepository = AppDataSource.getRepository(User);
     const { email } = req.body;
 
-    // console.log('Input Email:', email);
     const user = await userRepository.findOne({
       where: { email: email.toLowerCase() },
     });
@@ -181,14 +179,6 @@ export const forgotPasswordUser = async (req: AuthRequest, res: Response) => {
     user.resetTokenExpires = new Date(Date.now() + 3600000);
 
     await userRepository.save(user);
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_SMP_USERNAME,
-        pass: process.env.GMAIL_SMP_PASSWORD,
-      },
-    });
 
     const mailOptions = {
       from: process.env.GMAIL_SMP_USERNAME,
@@ -232,14 +222,6 @@ export const resetPassword = async (
   user.resetToken = token;
   user.resetTokenExpires = new Date(Date.now() + 3600000);
   await userRepository.save(user);
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GMAIL_SMP_USERNAME,
-      pass: process.env.GMAIL_SMP_PASSWORD,
-    },
-  });
 
   const mailOptions = {
     from: process.env.GMAIL_SMP_USERNAME,
