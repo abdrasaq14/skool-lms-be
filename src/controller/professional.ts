@@ -41,7 +41,6 @@ export const createProfessionalApplication = async (
     }
 
     const loggedInUserId = decodedToken.id;
-    console.log("Logged In User ID:", loggedInUserId); // Log loggedInUserId
 
     // Validate request body fields
     const fieldsToValidate = [
@@ -112,8 +111,6 @@ export const createProfessionalApplication = async (
       where: { user: { id: loggedInUserId } },
     });
 
-    // console.log("ifApplied", ifApplied);
-
     if (ifApplied) {
       return res.json({
         error: "You have already applied",
@@ -133,8 +130,6 @@ export const createProfessionalApplication = async (
         englishLanguageQualification,
       }
     );
-
-    console.log("New Professional Application:", newProfessionalApplication);
 
     await professionalApplicationRepository.save(newProfessionalApplication);
 
