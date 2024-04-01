@@ -24,5 +24,3 @@ router.get('/', getItems);
 router.post("/notification/:id", createNotification);
 
 export default router;
-
-// all changes made

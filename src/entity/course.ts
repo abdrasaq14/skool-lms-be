@@ -1,6 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
-import { User } from "./user";
-
+import { Entity, PrimaryGeneratedColumn, Column} from "typeorm";
 @Entity()
 export class Course {
   @PrimaryGeneratedColumn("uuid")
