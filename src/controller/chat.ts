@@ -12,6 +12,11 @@ export const getChats = async (req: Request, res: Response) => {
 
     // Get repository for Chat entity from AppDataSource
     const chatRepository = AppDataSource.getRepository(Chat);
+    const userRepository = AppDataSource.getRepository(User);
+
+    const recipient = await userRepository.findOne({
+      where: { id: receiverId },
+    });
 
     // Find all chats between the two specified users
     const chats = await chatRepository
@@ -43,7 +48,7 @@ export const getChats = async (req: Request, res: Response) => {
     }));
 
     // Send the conversation to the client
-    res.json({ conversation });
+    res.json({ conversation, recipient });
   } catch (error) {
     console.error("Error fetching chats:", error);
     res.status(500).json({ message: "Error fetching chats" });

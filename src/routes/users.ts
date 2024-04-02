@@ -100,4 +100,6 @@ router.delete("/chats/:messageId", deleteChatMessage);
 // Route to get all users that the current user is chatting with
 router.get("/chats/:userId", getChattingUsers);
 
+router.get("/chats/:receiverId", )
+
 export default router;

@@ -49,12 +49,31 @@ interface OnlineUser {
 let onlineUsers: OnlineUser[] = [];
 
 io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
+  console.log("a user connected", socket.id, onlineUsers);
 
   socket.on("addNewUser", (userId) => {
     !onlineUsers.some((user) => user.userId === userId) &&
       onlineUsers.push({ userId, socketId: socket.id as string });
-    console.log(onlineUsers);
+    console.log("online users", onlineUsers);
+  });
+
+  io.emit("onlineUsers", onlineUsers);
+
+  socket.on("sendMessage", (message) => {
+    console.log("socket-message", message);
+    const recipientSocket = onlineUsers.find(
+      (user) => user.userId === message.receiverId
+    );
+    if (recipientSocket) {
+      // Emit the message to the recipient's socket
+      io.to(recipientSocket.socketId).emit("message", message);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    // Remove user from online users on disconnect
+    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
+    console.log("a user disconnected", socket.id, onlineUsers);
   });
 });
 
