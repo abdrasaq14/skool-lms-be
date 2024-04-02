@@ -104,7 +104,6 @@ export const createUser = async (req: AuthRequest, res: Response) => {
 };
 
 export const loginUser = async (req: AuthRequest, res: Response) => {
-  console.log("request received-login starting.....");
 
   try {
     const userRepository = AppDataSource.getRepository(User);

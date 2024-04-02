@@ -21,7 +21,7 @@ export const createOnboarding = async (req: Request, res: Response) => {
 
     // Extract onboarding data from the request body
     const { course, applicationType } = req.body;
-    console.log(course);
+    
 
     const { courseType, studyMode, courseSearch, entryYear, entryMonth } =
       course;
@@ -67,7 +67,6 @@ export const createOnboarding = async (req: Request, res: Response) => {
     // Return a success message
     return res.json({ successMessage: "Onboarding completed successfully" });
   } catch (error) {
-    console.error(error);
     return res.json({ error: "Internal server error" });
   }
 };
