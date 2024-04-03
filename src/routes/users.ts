@@ -9,7 +9,6 @@ import {
   editUserDetails,
   fetchUserDashboard,
   hasUserApplied,
-  checkCourseAvailability,
 } from "../controller/user";
 import { createOnboarding } from "../controller/onboarding";
 import {
@@ -85,8 +84,7 @@ router.put("/notification/:id", updateNotification);
 // Route to delete notification
 router.delete("/notification/:id", deleteNotification);
 
-//Route to check course availability
-router.post("/check-availability", checkCourseAvailability);
+
 
 // Route to retrieve chats for a specific user
 router.get("/chats/:receiverId/:senderId", getChats);

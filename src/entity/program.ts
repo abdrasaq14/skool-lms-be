@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 @Entity()
-export class Course {
+export class Program {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
@@ -28,7 +28,7 @@ export class Course {
     courseSearch: string,
     entryYear: string,
     entryMonth: string,
-    userId: string,
+    userId: string
   ) {
     this.courseType = courseType;
     this.studyMode = studyMode;

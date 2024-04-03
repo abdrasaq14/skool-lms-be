@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../database/data-source";
 import { User } from "../entity/user";
-import { Course } from "../entity/course";
+import { Program } from "../entity/program";
 import { Onboarding } from "../entity/onboarding";
 import jwt from "jsonwebtoken";
 
@@ -21,7 +21,6 @@ export const createOnboarding = async (req: Request, res: Response) => {
 
     // Extract onboarding data from the request body
     const { course, applicationType } = req.body;
-    
 
     const { courseType, studyMode, courseSearch, entryYear, entryMonth } =
       course;
@@ -42,7 +41,7 @@ export const createOnboarding = async (req: Request, res: Response) => {
     }
 
     // Create Course and Application entities
-    const courseEntity = new Course(
+    const courseEntity = new Program(
       courseType,
       studyMode,
       courseSearch,
@@ -58,7 +57,7 @@ export const createOnboarding = async (req: Request, res: Response) => {
       userId
     );
 
-    const courseRepository = AppDataSource.getRepository(Course);
+    const courseRepository = AppDataSource.getRepository(Program);
     const applicationRepository = AppDataSource.getRepository(Onboarding);
 
     await courseRepository.save(courseEntity);

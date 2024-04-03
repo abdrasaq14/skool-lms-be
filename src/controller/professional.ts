@@ -4,7 +4,7 @@ import { validationResult, check } from "express-validator";
 import { User } from "../entity/user";
 
 import { ProfessionalApplication } from "../entity/professional-app";
-import { Course } from "../entity/course";
+import { Program } from "../entity/program";
 import { AppDataSource } from "../database/data-source";
 import cloudinary from "../utilities/cloudinary";
 import dotenv from "dotenv";
@@ -164,8 +164,14 @@ export const getProfessionalApplication = async (
     }
 
     // Destructure user details from the associated user
-    const { id: userId, firstName, lastName, email, phoneNumber, countryOfResidence,  } =
-      professionalApplication.user;
+    const {
+      id: userId,
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      countryOfResidence,
+    } = professionalApplication.user;
 
     // Include user details in the response
     const responsePayload = {
@@ -244,7 +250,7 @@ export const getAllProfessionalApplications = async (
         } = application;
 
         // Fetch course information based on user ID
-        const userCourses = await AppDataSource.getRepository(Course).find({
+        const userCourses = await AppDataSource.getRepository(Program).find({
           where: { userId: user.id },
         });
 
@@ -315,14 +321,12 @@ export const deleteProfessionalApplication = async (
   }
 };
 
-
-
 export const deleteMultipleProfessionalApplications = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const { applicationIds } = req.body; 
+    const { applicationIds } = req.body;
     console.log(applicationIds);
 
     const professionalApplicationRepository = AppDataSource.getRepository(
@@ -334,15 +338,10 @@ export const deleteMultipleProfessionalApplications = async (
       message: "Selected professional applications deleted successfully",
     });
   } catch (error) {
-    console.error(
-      "Error deleting multiple professional applications:",
-      error
-    );
+    console.error("Error deleting multiple professional applications:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
 
 // Admin to approve professional application
 

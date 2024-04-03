@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { User } from "../entity/user";
-import { Course } from "../entity/course";
+import { Program } from "../entity/program";
 import { ProfessionalApplication } from "../entity/professional-app";
 import { AppDataSource } from "../database/data-source";
 import jwt from "jsonwebtoken";
@@ -104,10 +104,9 @@ export const createUser = async (req: AuthRequest, res: Response) => {
 };
 
 export const loginUser = async (req: AuthRequest, res: Response) => {
-
   try {
     const userRepository = AppDataSource.getRepository(User);
-    const courseRepository = AppDataSource.getRepository(Course);
+    const courseRepository = AppDataSource.getRepository(Program);
 
     const { email, password } = req.body;
 
@@ -398,7 +397,7 @@ export const fetchUserDashboard = async (req: Request, res: Response) => {
     ProfessionalApplication
   );
 
-  const courseRepository = AppDataSource.getRepository(Course);
+  const courseRepository = AppDataSource.getRepository(Program);
 
   const token = req.headers.authorization?.split(" ")[1];
 
@@ -435,7 +434,7 @@ export const hasUserApplied = async (req: Request, res: Response) => {
     const professionalApplicationRepository = AppDataSource.getRepository(
       ProfessionalApplication
     );
-    const courseRepository = AppDataSource.getRepository(Course);
+    const courseRepository = AppDataSource.getRepository(Program);
 
     const token = req.headers.authorization?.split(" ")[1];
 
@@ -467,28 +466,3 @@ export const hasUserApplied = async (req: Request, res: Response) => {
   }
 };
 
-//Check course availability
-export const checkCourseAvailability = async (req: Request, res: Response) => {
-  const availableCourses = [
-    "Accounting",
-    "Biology",
-    "Computer Science",
-    "Economics",
-  ];
-
-  const { courseName } = req.body;
-
-  const course = await availableCourses.filter(
-    (course) => course.toLowerCase() === courseName.toLowerCase()
-  );
-
-  try {
-    if (course.length === 0) {
-      return res.json({ isAvailable: false, message: "Course not available" });
-    }
-
-    res.json({ isAvailable: true, message: "Course is available" });
-  } catch (error) {
-    res.json({ error: "Internal server error" });
-  }
-};
