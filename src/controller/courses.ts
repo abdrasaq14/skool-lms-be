@@ -32,14 +32,14 @@ export const createCourse = async (req: Request, res: Response) => {
 
       const course = new Courses();
       course.courseTitle = courseTitle;
-      course.user.id = decoded.id;
+      course.user = user;
 
       await AppDataSource.getRepository(Courses).save(course);
       res.json({ successMessage: "Course created successfully" });
     }
   } catch (error) {
     console.error("Error creating course:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.json({ error: "Internal Server Error" });
   }
 };
 

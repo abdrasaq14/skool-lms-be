@@ -30,6 +30,7 @@ import {
   deleteChatMessage,
   getChattingUsers,
 } from "../controller/chat";
+import { createCourse } from "../controller/courses";
 
 const router = Router();
 
@@ -84,8 +85,6 @@ router.put("/notification/:id", updateNotification);
 // Route to delete notification
 router.delete("/notification/:id", deleteNotification);
 
-
-
 // Route to retrieve chats for a specific user
 router.get("/chats/:receiverId/:senderId", getChats);
 
@@ -98,6 +97,9 @@ router.delete("/chats/:messageId", deleteChatMessage);
 // Route to get all users that the current user is chatting with
 router.get("/chats/:userId", getChattingUsers);
 
-router.get("/chats/:receiverId", )
+router.get("/chats/:receiverId");
+
+// Route to create a new course
+router.post("/addCourses", createCourse);
 
 export default router;
